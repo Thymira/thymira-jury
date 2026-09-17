@@ -1,0 +1,114 @@
+{
+  "schema_version": "1.0",
+  "description": "Mapping of governance requirements (EU AI Act, GDPR, and the data-science methodology invariants) to the deterministic MIRA controls whose evidence covers them. Ported to English from docs/legacy/compliance/mapeo_requisitos_controles.json (ADR-0002). Every control_id is a control MIRA already evaluates: a deterministic control in thymira.mira.checks.controls (A1-A17) or a reviewed-pack control in thymira.mira.preflight.",
+  "disclaimer": "This file supports audit preparation and requirements-coverage checks. It is not legal advice and is not a guarantee of compliance.",
+  "sources": {
+    "eu-ai-act-2024": {
+      "title": "Regulation (EU) 2024/1689 of the European Parliament and of the Council (Artificial Intelligence Act)",
+      "version": "Official Journal of the European Union, 12 July 2024",
+      "reference": "ELI: reg/2024/1689 (docs/legacy/compliance/fuentes.md, source ai-act-2024)"
+    },
+    "gdpr-2016": {
+      "title": "Regulation (EU) 2016/679 of the European Parliament and of the Council (General Data Protection Regulation)",
+      "version": "Official Journal of the European Union L 119, consolidated text 4 May 2016",
+      "reference": "ELI: reg/2016/679 (docs/legacy/compliance/fuentes.md, source rgpd-2016)"
+    },
+    "adr-0002-appendix-b": {
+      "title": "Thymira ADR-0002 -- Legacy disposition, Appendix B (methodology invariants that become MIRA checks)",
+      "version": "2026-08-21",
+      "reference": "docs/adr/0002-legacy-disposition.md"
+    }
+  },
+  "requirements": [
+    {
+      "framework": "EU_AI_ACT",
+      "requirement_id": "EU-AI-ACT-ART-11",
+      "source": "eu-ai-act-2024",
+      "location": "Article 11 and Annex IV",
+      "requirement": "Providers of high-risk AI systems draw up technical documentation before the system is placed on the market and keep it up to date, demonstrating conformity; its minimum content is set out in Annex IV.",
+      "control_ids": ["A5", "A10"],
+      "evidence": "artifact.created events for the technical-documentation artifacts, each present in the artifact manifest and matching the sha256 recorded on the event chain. A5 verifies the manifest; A10 compares the digest announced on the chain to the stored file."
+    },
+    {
+      "framework": "EU_AI_ACT",
+      "requirement_id": "EU-AI-ACT-ART-12",
+      "source": "eu-ai-act-2024",
+      "location": "Article 12",
+      "requirement": "High-risk AI systems technically allow for the automatic recording of events (logs) over the lifetime of the system, to a degree appropriate to the intended purpose, ensuring traceability.",
+      "control_ids": ["A1", "A2"],
+      "evidence": "The append-only, hash-chained events.jsonl reconstructed and verified end to end by verify_events (A1), with every started run closed by a run.completed or run.failed event (A2)."
+    },
+    {
+      "framework": "EU_AI_ACT",
+      "requirement_id": "EU-AI-ACT-ART-14",
+      "source": "eu-ai-act-2024",
+      "location": "Article 14",
+      "requirement": "High-risk AI systems are designed so they can be effectively overseen by natural persons while in use, including the ability to intervene in, override or stop the system.",
+      "control_ids": ["A3", "A7"],
+      "evidence": "policy.decision events that authorise each tool execution (A3) and human.approval_requested / human.approval events resolving every request that required human review (A7)."
+    },
+    {
+      "framework": "GDPR",
+      "requirement_id": "GDPR-ART-5",
+      "source": "gdpr-2016",
+      "location": "Article 5",
+      "requirement": "Personal data is processed lawfully, fairly and transparently, limited to what is necessary (data minimisation) and kept secure (integrity and confidentiality); the controller is accountable for these principles.",
+      "control_ids": ["A1"],
+      "evidence": "Canonical events retain exact model-visible values after source credential scrubbing so A1 can verify request reconstruction and chain integrity; API/export/trace projections apply redaction fail-closed, while the local storage ACL or mode restricts access to the canonical record."
+    },
+    {
+      "framework": "GDPR",
+      "requirement_id": "GDPR-ART-9",
+      "source": "gdpr-2016",
+      "location": "Article 9",
+      "requirement": "Processing of special categories of personal data (such as health, biometric-for-identification, or other sensitive attributes) is prohibited unless a specific exception applies with appropriate safeguards.",
+      "control_ids": ["A3", "A7"],
+      "evidence": "policy.decision events showing that any tool execution touching sensitive attributes ran only under an allowing decision or an approved human review (A3), and that every such approval request was answered (A7). MIRA preflight additionally raises inherent risk to 'high' for special-category data (RISK-HIGH-SPECIAL-CATEGORY)."
+    },
+    {
+      "framework": "GDPR",
+      "requirement_id": "GDPR-ART-22",
+      "source": "gdpr-2016",
+      "location": "Article 22",
+      "requirement": "A data subject has the right not to be subject to a decision based solely on automated processing (including profiling) with legal or similarly significant effects; permitted cases require safeguards including human intervention.",
+      "control_ids": ["A3", "A4", "A7"],
+      "evidence": "policy.decision events that never allow a final action without an allowing decision (A3), that record no tool execution after a BLOCK (A4), and that resolve every human-review request before the action proceeds (A7)."
+    },
+    {
+      "framework": "METHODOLOGY",
+      "requirement_id": "METH-LEAKAGE",
+      "source": "adr-0002-appendix-b",
+      "location": "Appendix B (leakage safety)",
+      "requirement": "No transformation (winsorising, imputation, encoding) is fitted on the target or a sensitive attribute, and leakage indicators (an exact target copy, absolute correlation >= 0.95, or identifier-suspected-but-target-correlated columns) are reported.",
+      "control_ids": ["METHODOLOGY-EVIDENCE-001"],
+      "evidence": "The methodology-base preflight control METHODOLOGY-EVIDENCE-001 requires fresh, integrity-verified methodology evidence for the run; the leakage-safe cores in thymira.tools.ds emit that evidence. The dedicated modelling control that asserts each indicator is FINAL work (ADR-0002 correction C-7)."
+    },
+    {
+      "framework": "METHODOLOGY",
+      "requirement_id": "METH-SPLIT-INTEGRITY",
+      "source": "adr-0002-appendix-b",
+      "location": "Appendix B (split and test discipline)",
+      "requirement": "Records are de-duplicated before splitting; the split has no overlap, complete coverage, non-empty partitions and per-class allocation; the test partition is read once, for the final evaluation, using the out-of-fold-selected threshold.",
+      "control_ids": ["METHODOLOGY-EVIDENCE-001"],
+      "evidence": "METHODOLOGY-EVIDENCE-001 requires fresh, integrity-verified methodology evidence; the split and evaluation evidence is produced by the leakage-safe splitting core. The split-integrity and test-once controls (inherited A11 and A14) are rebuilt in FINAL."
+    },
+    {
+      "framework": "METHODOLOGY",
+      "requirement_id": "METH-EVALUATION-RIGOR",
+      "source": "adr-0002-appendix-b",
+      "location": "Appendix B (evaluation rigour)",
+      "requirement": "Cross-validation preprocessing is fold-local and shared by every candidate; a trivial baseline is trained on identical folds to make the metrics interpretable; and subgroup (fairness) disparity is reported per sensitive attribute.",
+      "control_ids": ["METHODOLOGY-EVIDENCE-001"],
+      "evidence": "METHODOLOGY-EVIDENCE-001 gates on fresh, integrity-verified methodology evidence; the fold-local preprocessing, baseline and subgroup-metric evidence is produced by thymira.tools.ds. The per-invariant modelling controls are FINAL work."
+    },
+    {
+      "framework": "METHODOLOGY",
+      "requirement_id": "METH-REPRODUCIBILITY",
+      "source": "adr-0002-appendix-b",
+      "location": "Appendix B (reproducibility)",
+      "requirement": "Reproducibility metadata (random seed, library versions, single-thread execution, explicit estimator arguments) accompanies every model, and the run records its environment at start.",
+      "control_ids": ["A17", "METHODOLOGY-EVIDENCE-001"],
+      "evidence": "A17 verifies that the run captured its environment (provenance) at start; METHODOLOGY-EVIDENCE-001 requires the accompanying methodology evidence to be fresh and integrity-verified."
+    }
+  ]
+}

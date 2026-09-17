@@ -1,0 +1,38 @@
+# Code owners are requested for review automatically. Order matters: the last matching
+# pattern wins. Roles come from docs/roadmap/mvp-3-weeks.md (P1–P5); replace the handles
+# below with the teammate (or @Thymira/<team>) that owns each area when the team is complete.
+
+# Default: the two current members own everything not listed below.
+*                                   @Lucas-Martin-Lopez @Marioo14
+
+# P1 — Runtime / Tech Lead: contracts, core, state, API, repository tooling
+/packages/                          @Lucas-Martin-Lopez
+/runtime/core/                      @Lucas-Martin-Lopez
+/runtime/state/                     @Lucas-Martin-Lopez
+/apps/api/                          @Lucas-Martin-Lopez
+/scripts/                           @Lucas-Martin-Lopez
+/.github/                           @Lucas-Martin-Lopez
+/pyproject.toml                     @Lucas-Martin-Lopez
+/uv.lock                            @Lucas-Martin-Lopez
+
+# P2 — THY / Agents                (assign when the P2 teammate joins)
+# /runtime/thy/                     @<P2>
+# /runtime/agents/                  @<P2>
+
+# P3 — Tools / Execution / MLflow  (assign when the P3 teammate joins)
+# /runtime/tools/                   @<P3>
+# /services/sandbox-manager/        @<P3>
+
+# P4 — MIRA / Governance           (assign when the P4 teammate joins)
+# /runtime/mira/                    @<P4>
+# /runtime/policies/                @<P4>
+
+# P5 — CLI / UX / QA               (assign when the P5 teammate joins)
+# /adapters/                        @<P5>
+# /apps/web/                        @<P5>
+# /tests/                           @<P5>
+
+# Governance-sensitive files always get both current members.
+/runtime/policies/src/thymira/policies/defaults/ @Lucas-Martin-Lopez @Marioo14
+/docs/adr/                          @Lucas-Martin-Lopez @Marioo14
+/AGENTS.md                          @Lucas-Martin-Lopez @Marioo14

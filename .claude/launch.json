@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "thymira-api",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": ["run", "thymira-api", "--workspace", "examples/credit-risk", "--replace-credential"],
+      "port": 8000
+    },
+    {
+      "name": "thymira-web",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": ["run", "thymira-web", "--api-url", "http://127.0.0.1:8000"],
+      "port": 8080
+    }
+  ]
+}

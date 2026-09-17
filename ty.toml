@@ -1,0 +1,34 @@
+# ty configuration. Single source of truth: do NOT add [tool.ty] to pyproject.toml —
+# ty.toml takes precedence and the two would drift.
+[environment]
+python-version = "3.12"
+root = [
+    ".",
+    "./packages/schemas/src",
+    "./packages/events/src",
+    "./runtime/core/src",
+    "./runtime/state/src",
+    "./runtime/observability/src",
+    "./runtime/tools/src",
+    "./runtime/policies/src",
+    "./runtime/agents/src",
+    "./runtime/thy/src",
+    "./runtime/mira/src",
+    "./apps/api/src",
+    "./apps/web/src",
+    "./adapters/cli/src",
+]
+
+[src]
+include = ["tests", "scripts", ".agents/skills", "packages", "runtime", "apps", "adapters"]
+respect-ignore-files = true
+
+[terminal]
+output-format = "concise"
+
+# The LLM tests monkeypatch a fake `litellm` module whose attributes ty cannot see.
+[[overrides]]
+include = ["tests/thymira/test_agents_llm.py"]
+
+[overrides.rules]
+unresolved-attribute = "ignore"

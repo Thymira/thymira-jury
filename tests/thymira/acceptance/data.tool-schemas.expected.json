@@ -1,0 +1,192 @@
+[
+ {
+  "description": "Find files in the workspace whose paths match a glob pattern, ordered by path (never by modification time). Returns file paths only, never directories; a pattern with no \"/\" matches the basename at any depth. At most 100 paths are shown; the UTF-8 rendering is bounded at 32 KiB including its footer. The result names the true total and persists the complete ordered list as a discovery artifact referenced in artifact_ids.",
+  "name": "glob",
+  "parameters_json_schema": {
+   "description": "Arguments for glob.",
+   "properties": {
+    "path": {
+     "default": ".",
+     "description": "Directory to search in, workspace-relative.",
+     "title": "Path",
+     "type": "string"
+    },
+    "pattern": {
+     "description": "Glob pattern to match file paths against (e.g. \"**/*.py\", \"src/**/*.csv\"). A pattern with no \"/\" matches the basename at any depth.",
+     "minLength": 1,
+     "title": "Pattern",
+     "type": "string"
+    }
+   },
+   "required": [
+    "pattern"
+   ],
+   "title": "GlobArguments",
+   "type": "object"
+  }
+ },
+ {
+  "description": "Read a UTF-8 text file from the workspace and return its content, with no added line numbers. Use offset and limit to page through a large file; a partial or bounded window ends with a bracket such as \"[showing lines A-B of N]\", naming the total line count and any character/byte truncation. Use profile_dataset, not read_file, to understand a registered dataset.",
+  "name": "read_file",
+  "parameters_json_schema": {
+   "description": "Arguments for read_file.",
+   "properties": {
+    "limit": {
+     "default": 2000,
+     "description": "Maximum number of lines to return. Defaults to 2000.",
+     "maximum": 20000,
+     "minimum": 1,
+     "title": "Limit",
+     "type": "integer"
+    },
+    "offset": {
+     "default": 1,
+     "description": "1-based first line to return.",
+     "minimum": 1,
+     "title": "Offset",
+     "type": "integer"
+    },
+    "path": {
+     "minLength": 1,
+     "title": "Path",
+     "type": "string"
+    }
+   },
+   "required": [
+    "path"
+   ],
+   "title": "ReadFileArguments",
+   "type": "object"
+  }
+ },
+ {
+  "description": "Create a deterministic JSON profile (missingness, distributions, numeric correlations) of a registered dataset and save it as a report artifact. Use it before modelling; it is the only correct way to look at a dataset, because the profile is bounded and reproducible.",
+  "name": "profile_dataset",
+  "parameters_json_schema": {
+   "description": "Shared dataset tool arguments.",
+   "properties": {
+    "columns": {
+     "anyOf": [
+      {
+       "items": {
+        "type": "string"
+       },
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Columns"
+    },
+    "dataset": {
+     "minLength": 1,
+     "title": "Dataset",
+     "type": "string"
+    },
+    "description": {
+     "description": "Clear, concise description of what this call does in active voice, 5-10 words (shown in the UI and recorded as evidence). Examples: \"Profile missing values per column\"; \"Train the logistic-regression baseline\"; \"Write the feature-engineering script\".",
+     "maxLength": 200,
+     "minLength": 1,
+     "title": "Description",
+     "type": "string"
+    },
+    "max_rows": {
+     "default": 100000,
+     "exclusiveMinimum": 0,
+     "maximum": 1000000,
+     "title": "Max Rows",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "dataset",
+    "description"
+   ],
+   "title": "DatasetArguments",
+   "type": "object"
+  }
+ },
+ {
+  "description": "Run a bounded read-only SQL query over a registered dataset. The dataset argument only selects which registered dataset is loaded -- inside the SQL itself, the table is always named literally `dataset` (never the dataset's own name), so query it as `SELECT ... FROM dataset ...`.",
+  "name": "query_sql",
+  "parameters_json_schema": {
+   "description": "Arguments for a read-only dataset query.",
+   "properties": {
+    "dataset": {
+     "minLength": 1,
+     "title": "Dataset",
+     "type": "string"
+    },
+    "description": {
+     "description": "Clear, concise description of what this call does in active voice, 5-10 words (shown in the UI and recorded as evidence). Examples: \"Profile missing values per column\"; \"Train the logistic-regression baseline\"; \"Write the feature-engineering script\".",
+     "maxLength": 200,
+     "minLength": 1,
+     "title": "Description",
+     "type": "string"
+    },
+    "max_rows": {
+     "default": 10000,
+     "exclusiveMinimum": 0,
+     "maximum": 100000,
+     "title": "Max Rows",
+     "type": "integer"
+    },
+    "query": {
+     "minLength": 1,
+     "title": "Query",
+     "type": "string"
+    }
+   },
+   "required": [
+    "dataset",
+    "query",
+    "description"
+   ],
+   "title": "QuerySqlArguments",
+   "type": "object"
+  }
+ },
+ {
+  "description": "The Data agent's structured output: a dataset's shape, not its raw contents.",
+  "name": "final_result",
+  "parameters_json_schema": {
+   "properties": {
+    "columns": {
+     "items": {
+      "type": "string"
+     },
+     "minItems": 1,
+     "type": "array"
+    },
+    "dtypes": {
+     "additionalProperties": {
+      "type": "string"
+     },
+     "type": "object"
+    },
+    "missing": {
+     "additionalProperties": {
+      "type": "integer"
+     },
+     "type": "object"
+    },
+    "target_candidates": {
+     "default": [],
+     "items": {
+      "type": "string"
+     },
+     "type": "array"
+    }
+   },
+   "required": [
+    "columns",
+    "dtypes",
+    "missing"
+   ],
+   "title": "DataProfile",
+   "type": "object"
+  }
+ }
+]

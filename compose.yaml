@@ -1,0 +1,53 @@
+services:
+  thymira:
+    build:
+      context: .
+    image: thymira:dev
+    # No `env_file:` here on purpose (F6.2): that directive hands Docker the raw file before
+    # either Python loader (thymira.api.env, thymira.cli.env) ever runs, so their PATH/LD_PRELOAD/
+    # THYMIRA_SANDBOX_* refusals would never see it and never fire. Every variable the container
+    # may receive is named explicitly below instead -- compose substitutes each `${VAR}` from the
+    # real shell environment or a `.env` beside this file, but only a name listed here ever
+    # reaches the container; PATH, LD_PRELOAD and THYMIRA_SANDBOX_* are deliberately absent from
+    # this list (set those, if ever needed, as real environment variables on the host or CI, never
+    # through the project's checked-in .env).
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - THYMIRA_THY_MODEL=${THYMIRA_THY_MODEL:-}
+      - THYMIRA_MIRA_MODEL=${THYMIRA_MIRA_MODEL:-}
+      - THYMIRA_ORCHESTRATOR_MODEL=${THYMIRA_ORCHESTRATOR_MODEL:-}
+      - THYMIRA_MODEL_FRONTIER=${THYMIRA_MODEL_FRONTIER:-}
+      - THYMIRA_MODEL_STANDARD=${THYMIRA_MODEL_STANDARD:-}
+      - THYMIRA_MODEL_FAST=${THYMIRA_MODEL_FAST:-}
+      - THYMIRA_AGENT_MODEL=${THYMIRA_AGENT_MODEL:-}
+      - THYMIRA_MODEL=${THYMIRA_MODEL:-}
+      - THYMIRA_REASONING_EFFORT=${THYMIRA_REASONING_EFFORT:-}
+      - THYMIRA_THY_MIN_TIER=${THYMIRA_THY_MIN_TIER:-}
+      - THYMIRA_MIRA_MIN_TIER=${THYMIRA_MIRA_MIN_TIER:-}
+      - THYMIRA_AGENT_MIN_TIER=${THYMIRA_AGENT_MIN_TIER:-}
+      - OTEL_TRACES_EXPORTER=${OTEL_TRACES_EXPORTER:-}
+      - OTEL_SERVICE_NAME=${OTEL_SERVICE_NAME:-}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY:-}
+      - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY:-}
+      - LANGFUSE_BASE_URL=${LANGFUSE_BASE_URL:-}
+      - LANGFUSE_TRACING_ENVIRONMENT=${LANGFUSE_TRACING_ENVIRONMENT:-}
+      - LANGFUSE_RELEASE=${LANGFUSE_RELEASE:-}
+      - LANGFUSE_SAMPLE_RATE=${LANGFUSE_SAMPLE_RATE:-}
+      - LANGFUSE_TRACING_ENABLED=${LANGFUSE_TRACING_ENABLED:-}
+    volumes:
+      - ./runs:/app/runs
+      - ./data:/app/data:ro
+      - ./examples:/app/examples:ro
+
+# Example (the CLI is a stub until MVP week 1):
+#   docker compose run --rm thymira --help
+# The MVP keeps Run evidence locally in JSON/JSONL. Additional services are not part of this
+# compose file.
+#
+# compose reads a `.env` beside this file only to fill the `${VAR}` placeholders above -- it is
+# never handed to the container as a file (see the `environment:` comment). To pass a sandbox
+# backend choice or any other operator decision through, export it in the shell that runs
+# `docker compose`/`just docker-run`, or add it explicitly to `environment:` above; do not add it
+# back as `env_file:`.

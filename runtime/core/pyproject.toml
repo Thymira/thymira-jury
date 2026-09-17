@@ -1,0 +1,40 @@
+[project]
+name = "thymira-core"
+version = "0.1.0"
+description = "Thymira Runtime: Run/Session services, LangGraph wiring, checkpoints, resume, the single place where ThyGraph and MiraGraph are composed."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+dependencies = [
+    "pyyaml>=6,<7",
+    "thymira-schemas",
+    "thymira-events",
+    "thymira-observability",
+    "thymira-state",
+    "thymira-agents",
+    "thymira-policies",
+    "thymira-tools",
+    "thymira-thy",
+    "thymira-mira",
+    "langgraph>=1.0,<2",
+    "pika>=1.3,<2",
+]
+
+[tool.uv.sources]
+thymira-observability = { workspace = true }
+thymira-schemas = { workspace = true }
+thymira-events = { workspace = true }
+thymira-state = { workspace = true }
+thymira-agents = { workspace = true }
+thymira-policies = { workspace = true }
+thymira-tools = { workspace = true }
+thymira-thy = { workspace = true }
+thymira-mira = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "thymira.core"
+namespace = true

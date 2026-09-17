@@ -1,0 +1,33 @@
+[project]
+name = "thymira-thy"
+version = "0.1.0"
+description = "THY — the production / data-science orchestrator (ThyGraph: Inspect -> Plan -> Execute -> Summarize) coordinating Data, Coding/Execution and Experiment agents in the MVP."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+dependencies = [
+    "langgraph>=1.2,<2",
+    "pyyaml>=6,<7",
+    "thymira-schemas",
+    "thymira-events",
+    "thymira-observability",
+    "thymira-agents",
+    "thymira-tools",
+    "thymira-policies",
+]
+
+[tool.uv.sources]
+thymira-observability = { workspace = true }
+thymira-schemas = { workspace = true }
+thymira-events = { workspace = true }
+thymira-agents = { workspace = true }
+thymira-tools = { workspace = true }
+thymira-policies = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "thymira.thy"
+namespace = true

@@ -1,0 +1,24 @@
+[project]
+name = "thymira-observability"
+version = "0.1.0"
+description = "Langfuse tracing seam: explicit, redacted observations at the Run, agent, model and tool boundaries, off unless configured."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+dependencies = [
+    "thymira-events",
+    "langfuse>=4.15,<5",
+    "opentelemetry-api>=1.27,<2",
+    "opentelemetry-sdk>=1.27,<2",
+]
+
+[tool.uv.sources]
+thymira-events = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "thymira.observability"
+namespace = true

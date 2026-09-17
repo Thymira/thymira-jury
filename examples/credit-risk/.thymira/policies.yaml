@@ -1,0 +1,47 @@
+# Project policy overlay for the credit-risk example (owner P4).
+#
+# Loaded with `thymira.policies.load_policy` and layered on the shipped defaults
+# (`load_policy_stack("credit_risk").merged_with(project)`): overlay rules are evaluated before
+# the `credit_risk` and `base` rules, first match wins, BLOCK always takes precedence.
+# MIRA produces findings; these deterministic rules turn them into decisions — never an LLM.
+name: credit-risk-example
+version: "0.1"
+description: Project-specific finding rules for examples/credit-risk.
+
+# The base policy has no rule for `plan.proposed`, so it falls through to
+# `default_decision: REQUIRE_HUMAN_REVIEW` -- a decision the MVP's synchronous InlineDispatcher
+# cannot satisfy (there is no mid-execution pause/resume for THY's own plan gate, unlike MIRA's
+# post-hoc findings review). Left unrouted, every real `thymira run` against this project halts as
+# FAILED before touching the dataset (`ThySubgraph.invoke`'s documented error path). This mirrors
+# `tests/thymira/test_core_graph_adapters.py`'s own `_PLAN_PASSES` test policy: let THY's plan
+# through so the demo can execute for real, while MIRA's post-hoc CRX-101/102/103 review above
+# still gates the Run's completion exactly as before.
+action_rules:
+  - id: CRX-001
+    description: THY's own plan proposal may proceed; MIRA's post-hoc review still gates completion.
+    action_types: [plan.proposed]
+    decision: PASS
+    reason: "Demo project: THY's plan runs; the credit-risk finding rules above still review the outcome."
+
+finding_rules:
+  - id: CRX-101
+    description: A high-severity finding without evidence cannot be resolved automatically.
+    min_severity: HIGH
+    evidence: missing
+    decision: REQUIRE_HUMAN_REVIEW
+    reason: "High-severity finding without attached evidence: a human must look at it."
+  - id: CRX-102
+    description: Confident high-severity credit-risk findings always reach a human.
+    min_severity: HIGH
+    min_confidence: 0.9
+    frameworks: [CREDIT_RISK]
+    decision: REQUIRE_HUMAN_REVIEW
+    reason: "A confident high-severity credit-risk finding requires human review before completion."
+  - id: CRX-103
+    description: Evidence of train/test leakage blocks the run.
+    control_ids: [A11, A14, A20]
+    decision: BLOCK
+    reason: "Train/test leakage invalidates every metric of a credit model."
+
+# Findings no rule matches are surfaced, not hidden.
+findings_default_decision: WARNING

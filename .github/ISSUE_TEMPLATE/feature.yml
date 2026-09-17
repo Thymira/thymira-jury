@@ -1,0 +1,41 @@
+name: Feature / roadmap item
+description: A deliverable from the roadmap or a new capability, with its place in the tree.
+title: "feat: "
+labels: [enhancement]
+body:
+  - type: input
+    id: roadmap
+    attributes:
+      label: Roadmap reference
+      description: Week, day and owner in `docs/roadmap/mvp-3-weeks.md` (or "post-MVP").
+      placeholder: "Week 1, P3 Wednesday — run_python sandbox tool"
+    validations:
+      required: true
+  - type: input
+    id: location
+    attributes:
+      label: Where it lives
+      description: Member / subpackage per the `repo-skeleton` skill (`references/roadmap-to-layout.md`).
+      placeholder: "runtime/tools/src/thymira/tools/python/"
+    validations:
+      required: true
+  - type: textarea
+    id: behaviour
+    attributes:
+      label: Behaviour and definition of done
+      description: What must be observable when it is done (events emitted, artifacts, API response, CLI output, tests).
+    validations:
+      required: true
+  - type: textarea
+    id: governance
+    attributes:
+      label: Governance impact
+      description: New tool capability, risk tags, policy rules or audit controls it needs — or "none".
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before opening the PR
+      options:
+        - label: "Tests in the right lane (`python-testing`)"
+        - label: "Import direction respected (`just check-imports`)"
+        - label: "`CHANGELOG.md` entry"

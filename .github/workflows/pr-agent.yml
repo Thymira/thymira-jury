@@ -1,0 +1,29 @@
+name: PR Agent
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, synchronize]
+  issue_comment:
+
+jobs:
+  pr-agent:
+    if: ${{ github.event.sender.type != 'Bot' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: write
+      checks: write
+    steps:
+      - name: Check whether an LLM key is configured
+        id: key
+        run: echo "present=${{ secrets.OPENAI_KEY != '' }}" >> "$GITHUB_OUTPUT"
+      - name: Run PR Agent
+        if: steps.key.outputs.present == 'true'
+        uses: the-pr-agent/pr-agent@4ebd5c5333c6ef21509e7304d27969eb825e6f22 # v0.43.0
+        env:
+          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Explain why nothing ran
+        if: steps.key.outputs.present != 'true'
+        run: echo "Set the OPENAI_KEY repository secret to enable automated PR review."

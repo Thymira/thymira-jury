@@ -1,0 +1,26 @@
+[project]
+name = "thymira-policies"
+version = "0.1.0"
+description = "Policy Engine: deterministic rules that turn audit findings (severity, confidence, evidence, framework) into PASS / WARNING / REQUIRE_HUMAN_REVIEW / BLOCK."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+dependencies = [
+    "thymira-schemas",
+    "thymira-events",
+    "thymira-observability",
+    "pyyaml>=6,<7",
+]
+
+[tool.uv.sources]
+thymira-schemas = { workspace = true }
+thymira-events = { workspace = true }
+thymira-observability = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "thymira.policies"
+namespace = true

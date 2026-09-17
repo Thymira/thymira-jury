@@ -1,0 +1,54 @@
+{
+  "_comment": "Mapeo de requisitos normativos a controles TECNICOS concretos del repo. Este fichero conecta la ley con el codigo: cada requisito apunta a la fuente (compliance/fuentes.md) y al mecanismo que genera su evidencia. Es una ayuda de preparacion, no una garantia de cumplimiento.",
+  "version": "0.1.0",
+  "mappings": [
+    {
+      "requirement_id": "REQ-001",
+      "source_id": "ai-act-2024",
+      "location": "art. 12",
+      "requirement": "Registro automatico de eventos durante el funcionamiento",
+      "technical_control": "Traza JSONL append-only con cadena de hashes (src/mads/tracing.py)",
+      "evidence": "trace.jsonl verificable con `mads verify`"
+    },
+    {
+      "requirement_id": "REQ-002",
+      "source_id": "ai-act-2024",
+      "location": "art. 14",
+      "requirement": "Supervision humana efectiva",
+      "technical_control": "Gate con needs_approval y aprobador humano (src/mads/gate.py, regla AML-003)",
+      "evidence": "eventos approval_requested / human_response en la traza"
+    },
+    {
+      "requirement_id": "REQ-003",
+      "source_id": "ai-act-2024",
+      "location": "art. 11 y Anexo IV",
+      "requirement": "Documentacion tecnica del sistema",
+      "technical_control": "Skill generate_docs ejecutada por un worker temporal + manifest de artefactos con hash",
+      "evidence": "artifacts/case_report.md y artifacts/manifest.json"
+    },
+    {
+      "requirement_id": "REQ-004",
+      "source_id": "rgpd-2016",
+      "location": "art. 9",
+      "requirement": "Tratamiento de categorias especiales de datos bajo control",
+      "technical_control": "Regla AML-002: entrenar con atributos sensibles exige aprobacion humana",
+      "evidence": "gate_decision con rule_id AML-002 en la traza"
+    },
+    {
+      "requirement_id": "REQ-005",
+      "source_id": "rgpd-2016",
+      "location": "art. 5 (minimizacion) y 32 (seguridad)",
+      "requirement": "No persistir datos personales ni secretos innecesarios",
+      "technical_control": "Redaccion de prompts antes de trazar (src/mads/utils.py::redact)",
+      "evidence": "eventos llm_call con prompt_redacted"
+    },
+    {
+      "requirement_id": "REQ-006",
+      "source_id": "ai-act-2024",
+      "location": "art. 22 RGPD / art. 14 AI Act",
+      "requirement": "Ninguna decision final plenamente automatizada",
+      "technical_control": "Reglas AML-001 (blocked) y AML-003 (needs_approval)",
+      "evidence": "gate_decision correspondiente en la traza de cada caso"
+    }
+  ]
+}

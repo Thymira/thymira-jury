@@ -1,0 +1,67 @@
+{
+  "artifacts": [
+    {
+      "kind": "dataset",
+      "name": "datasets/german_credit.csv",
+      "sha256": "e28da99f8e65a6cad1146b0cfdbe77778f805b7ffa5b4aadf621145e224b127d",
+      "size_bytes": 192804
+    },
+    {
+      "kind": "other",
+      "name": "datasets/german_credit.schema.json",
+      "sha256": "<verified-at-runtime>",
+      "size_bytes": "<verified-at-runtime>"
+    },
+    {
+      "kind": "report",
+      "name": "profile/german_credit.json",
+      "sha256": "<verified-at-runtime>",
+      "size_bytes": "<verified-at-runtime>"
+    },
+    {
+      "kind": "other",
+      "name": "resume/{{id}}.json",
+      "sha256": "<verified-at-runtime>",
+      "size_bytes": "<verified-at-runtime>"
+    }
+  ],
+  "workspace": {
+    "files": [
+      {
+        "path": ".thymira/config.yaml",
+        "sha256": "629071b80a64042f9fbac0de0632def3d9181ef3e13b118ab372a2738a1df6f4",
+        "size": 366
+      },
+      {
+        "path": ".thymira/context.md",
+        "sha256": "cff9dfab6a8ddfaa2da2f6e8bb756a493691fc16c13748f24d8c3a3fb5b758d5",
+        "size": 2840
+      },
+      {
+        "path": ".thymira/policies.yaml",
+        "sha256": "cafcc824f6e57aa74e684e5e40c08c2d3bc350d76e49020c4ad9b18f1d228dd1",
+        "size": 2440
+      },
+      {
+        "path": "data/applications.csv",
+        "sha256": "e28da99f8e65a6cad1146b0cfdbe77778f805b7ffa5b4aadf621145e224b127d",
+        "size": 192804
+      },
+      {
+        "path": "data/README.md",
+        "sha256": "2b2ea236c7f722d30aceeded17a5c653e3ad9b5d359c606850619857c9058370",
+        "size": 223
+      },
+      {
+        "path": "README.md",
+        "sha256": "09a8fd814559bd3be580f529c45035340020300ac21bca586502f08cbad4b1bc",
+        "size": 4573
+      },
+      {
+        "path": "reports/exploratory-data-analysis.md",
+        "sha256": "5a87945d85dedf63337a90fe83d74682af4f014f869248b948539c4f055dd1a8",
+        "size": 10384
+      }
+    ]
+  }
+}

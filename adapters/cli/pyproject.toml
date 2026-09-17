@@ -1,0 +1,23 @@
+[project]
+name = "thymira-cli"
+version = "0.1.0"
+description = "The `thymira` CLI — first official interface and a thin client of the Thymira API (thymira run / status / runs / audit / experiment / approve / reject)."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+dependencies = [
+    "typer>=0.15,<1",
+    "python-dotenv>=1.0,<2",
+    "httpx>=0.27,<1",
+]
+
+[project.scripts]
+thymira = "thymira.cli.__main__:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "thymira.cli"
+namespace = true

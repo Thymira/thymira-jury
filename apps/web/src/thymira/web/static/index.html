@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Thymira Console</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/console.css">
+  <script type="module" src="/static/js/main.js"></script>
+</head>
+<body>
+  <header class="bar">
+    <a class="wordmark" href="#/">
+      <span class="wordmark-glyph" aria-hidden="true"><i></i><i></i></span>
+      <span class="wordmark-name"><span class="wordmark-thy">THY</span><span class="wordmark-mira">MIRA</span></span>
+      <span class="wordmark-sub">console</span>
+    </a>
+    <span class="bar-spacer"></span>
+    <a class="bar-button" href="#/settings">Settings</a>
+    <span class="api-state" id="api-state" data-state="unknown">API</span>
+    <button class="bar-button" id="lock" type="button">Connect</button>
+  </header>
+  <div class="shell">
+    <aside class="rail" id="rail" aria-label="Runs"></aside>
+    <main class="main" id="main"></main>
+  </div>
+  <dialog class="connect" id="connect" aria-labelledby="connect-title">
+    <form id="connect-form">
+      <h2 id="connect-title">Connect to the Thymira API</h2>
+      <p>Requests go to the API with the token you paste here. It is kept in this browser tab only and
+        is gone when the tab closes.</p>
+      <label for="token">API token</label>
+      <input class="input" id="token" name="token" type="password" autocomplete="off" spellcheck="false">
+      <p class="connect-hint">The API prints where it wrote its token when it starts; by default
+        <code>&lt;workspace&gt;/.thymira/runtime/api-token</code>.</p>
+      <p class="connect-error" id="connect-error" hidden></p>
+      <div class="connect-actions">
+        <button class="btn" type="button" id="connect-cancel">Not now</button>
+        <button class="btn btn-primary" type="submit">Connect</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>

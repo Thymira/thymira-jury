@@ -1,0 +1,122 @@
+# ---------------------------------------------------------------- Python
+__pycache__/
+*.py[codz]
+*$py.class
+*.egg-info/
+*.egg
+.eggs/
+build/
+dist/
+wheels/
+pip-wheel-metadata/
+
+# Environments (uv.lock is tracked on purpose)
+.venv/
+venv/
+.python-version.local
+
+# ------------------------------------------------------ secrets and config
+# Only the example is tracked; every real env file stays local.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+.secrets/
+secrets.*.yaml
+compose.override.yaml
+docker-compose.override.yml
+
+# ------------------------------------------------------------- tool caches
+.pytest_cache/
+.pytest-*/
+.hypothesis/
+.ruff_cache/
+.import_linter_cache/
+.mypy_cache/
+.pytype/
+.pyre/
+.dmypy.json
+.tox/
+.nox/
+.cache/
+.benchmarks/
+.coverage
+.coverage.*
+coverage.xml
+coverage.json
+htmlcov/
+.ipynb_checkpoints/
+.virtual_documents/
+site/
+
+# ---------------------------------------------- runs, experiments, local data
+# Run evidence, experiment tracking and local databases never enter git.
+runs/
+# Throwaway git worktrees, and the tool scripts a Run writes into a project workspace.
+.claude/worktrees/
+**/.thymira/runtime/
+**/.thymira/tool_*.py
+mlruns/
+mlartifacts/
+mlflow.db
+*.db
+*.sqlite
+*.sqlite3
+logs/
+*.log
+tmp/
+scratch/
+# Datasets: only the demo file and its README are tracked; anything else dropped
+# into data/ (downloads, private data) stays local. Same for example projects.
+data/*
+!data/german_credit.csv
+!data/README.md
+examples/**/data/*
+!examples/**/data/README.md
+
+# ------------------------------------------------- TypeScript / Node (apps/web, SDKs)
+node_modules/
+.pnpm-store/
+*.tsbuildinfo
+.next/
+.vite/
+out/
+*.vsix
+
+# ----------------------------------------------------------- infrastructure
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log
+kubeconfig
+*.kubeconfig
+
+# ------------------------------------------------------------------ IDEs / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+*.bak
+*.orig
+*.tmp
+
+# --------------------------- coding agents: shared config tracked, personal not
+.claude/settings.local.json
+.claude/*.local.*
+.claude/.credentials*
+.gemini/*.local.*
+.gemini/tmp/
+.cursor/*.local.*
+# Codex CLI's own scratch: throwaway pytest workspaces a slow/integration test run leaves behind
+# under a project-relative tmp root, never test fixtures.
+.codex/pytest-audit-*/
+.codex/roster-drift-*/

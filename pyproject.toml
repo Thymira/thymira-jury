@@ -1,0 +1,251 @@
+# Workspace root of Thymira — the Agentic Data Science Runtime. This root is *virtual*: it
+# publishes nothing and installs nothing by itself. The code lives in the workspace members
+# (`thymira.<name>` namespace packages); install everything with `uv sync --all-packages`.
+[project]
+name = "thymira-workspace"
+version = "0.1.0"
+description = "Thymira: Agentic Data Science Runtime (uv workspace root, not published)"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+dependencies = []
+
+# PEP 735 dependency groups: local tooling, never published. `uv sync` installs `dev`.
+[dependency-groups]
+test = [
+    "pytest>=9.1,<10",
+    "pytest-cov>=7.1,<8",
+    "pytest-xdist>=3.8,<4",
+    "hypothesis>=6.165",
+]
+lint = [
+    "ruff>=0.16.3,<0.17",
+    "import-linter>=2.13,<3",
+    "yamllint>=1.38,<2",
+    "pre-commit>=4.6,<5",
+]
+# ty is pre-1.0: pin exactly so diagnostics are reproducible across machines and CI.
+typecheck = ["ty==0.0.73"]
+dev = [
+    { include-group = "test" },
+    { include-group = "lint" },
+    { include-group = "typecheck" },
+]
+
+[tool.uv]
+package = false
+default-groups = ["dev"]
+required-version = ">=0.12"
+
+# Monorepo (E2E Architecture Baseline v2). Adding a member: list it here, in ruff `src`, in
+# ty.toml `root`, in `[tool.importlinter] root_packages` and in
+# tests/thymira/test_workspace_imports.py.
+[tool.uv.workspace]
+members = [
+    "packages/schemas",
+    "packages/events",
+    "runtime/core",
+    "runtime/state",
+    "runtime/observability",
+    "runtime/tools",
+    "runtime/policies",
+    "runtime/agents",
+    "runtime/thy",
+    "runtime/mira",
+    "apps/api",
+    "apps/web",
+    "adapters/cli",
+]
+
+# ---------------------------------------------------------------------------
+# Ruff (lint + format). ty is configured in ty.toml, import-linter below.
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["tests", "scripts", "packages/*/src", "runtime/*/src", "apps/*/src", "adapters/*/src"]
+# `.claude/worktrees` holds throwaway git worktrees, and a Run executed inside one writes the
+# `run_python` scripts a model wrote into its workspace's `.thymira/`. Linting a model's
+# scratch code turned `just lint` red for reasons no commit here can fix.
+extend-exclude = [
+    ".claude/skills",
+    ".claude/worktrees",
+    ".pytest-tmp",
+    "runs",
+    "data",
+    "docs/legacy",
+]
+
+[tool.ruff.lint]
+select = [
+    "E", "W",   # pycodestyle
+    "F",        # pyflakes
+    "I",        # isort
+    "D",        # pydocstyle (Google convention, see below)
+    "ANN",      # flake8-annotations
+    "B",        # flake8-bugbear
+    "UP",       # pyupgrade
+    "N",        # pep8-naming
+    "SIM",      # flake8-simplify
+    "C4",       # flake8-comprehensions
+    "RUF",      # ruff-specific
+    "PT",       # flake8-pytest-style
+    "PTH",      # flake8-use-pathlib
+    "T20",      # flake8-print
+    "ARG",      # flake8-unused-arguments
+    "TRY",      # tryceratops
+    "BLE",      # flake8-blind-except
+    "DTZ",      # flake8-datetimez
+    "ERA",      # eradicate (commented-out code)
+    "ISC",      # flake8-implicit-str-concat
+    "PIE",      # flake8-pie
+    "RET",      # flake8-return
+    "PERF",     # perflint
+    "FURB",     # refurb
+    "PL",       # pylint (errors, warnings, conventions and refactor/complexity)
+    "S",        # flake8-bandit
+    "A",        # flake8-builtins
+    "G",        # flake8-logging-format
+    "RSE",      # flake8-raise
+    "SLF",      # flake8-self
+    "TID",      # flake8-tidy-imports
+    "TC",       # flake8-type-checking
+]
+ignore = [
+    "COM812", "ISC001",  # conflict with the formatter
+    "TRY003",            # long messages in exceptions are fine here
+    "ANN401",            # `Any` is allowed where it is the honest type (payloads, JSON)
+    "D105", "D107",      # magic methods and __init__ need no docstring
+    "PLR0913",           # keyword-only signatures with > 5 parameters are explicit, not smelly
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/**" = ["S101", "ARG", "PLR2004", "SLF001", "S311", "S603", "S607", "D1", "ANN", "PLC0415"]
+# Repo tooling: prints, subprocess by design, numeric thresholds inline.
+"scripts/**" = ["T20", "S603", "S607", "PLR2004"]
+".agents/skills/**" = ["T20", "S603", "S607", "PLR2004"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["thymira"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.pylint]
+max-args = 7
+
+# pydantic resolves annotations at runtime: imports used only in model fields must stay real.
+[tool.ruff.lint.flake8-type-checking]
+runtime-evaluated-base-classes = [
+    "pydantic.BaseModel",
+    "thymira.schemas.ThymiraModel",
+    "thymira.schemas.base.ThymiraModel",
+]
+
+[tool.ruff.format]
+docstring-code-format = true
+# ruff 0.16 formats Python code fences inside Markdown; our Markdown (docs, SKILL.md files)
+# shows examples verbatim and must not be rewritten.
+exclude = ["*.md"]
+
+# ---------------------------------------------------------------------------
+# pytest / coverage
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Serial by default: reproducible everywhere. Opt into parallelism with `pytest -n auto`;
+# concurrent runs need their own `--basetemp`.
+addopts = "--basetemp=.pytest-tmp --strict-markers"
+markers = [
+    "slow: end-to-end runs that take minutes (real training, full graphs); excluded by `just test`",
+    "integration: external services (such as MLflow), the API server, the CLI as a subprocess, or real training",
+]
+
+[tool.coverage.run]
+source = ["packages", "runtime", "apps", "adapters"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+# "No PR lowers coverage" (AGENTS.md) made real: the full suite fails under this floor.
+# Measured 95 % on 2026-08-22; raise the floor as the runtime grows, never lower it.
+fail_under = 90
+
+# ---------------------------------------------------------------------------
+# import-linter: the architecture as machine-checked contracts (`just check-imports`).
+# `thymira` is a namespace package, so every portion is a root package. Layers are listed
+# highest first; a layer may import the ones below it, never above. Modules joined with `|`
+# are independent siblings.
+# ---------------------------------------------------------------------------
+[tool.importlinter]
+root_packages = [
+    "thymira.schemas",
+    "thymira.events",
+    "thymira.observability",
+    "thymira.state",
+    "thymira.policies",
+    "thymira.tools",
+    "thymira.agents",
+    "thymira.thy",
+    "thymira.mira",
+    "thymira.core",
+    "thymira.api",
+    "thymira.cli",
+    "thymira.web",
+]
+exclude_type_checking_imports = true
+
+[[tool.importlinter.contracts]]
+name = "Runtime layers (highest first)"
+type = "layers"
+layers = [
+    "thymira.api",
+    "thymira.core",
+    "thymira.thy | thymira.mira",
+    "thymira.agents",
+    "thymira.tools",
+    "thymira.policies",
+    "thymira.state",
+    "thymira.observability",
+    "thymira.events",
+    "thymira.schemas",
+]
+
+[[tool.importlinter.contracts]]
+name = "THY and MIRA never import each other (composed only in thymira.core)"
+type = "independence"
+modules = ["thymira.thy", "thymira.mira"]
+
+[[tool.importlinter.contracts]]
+name = "Contracts (schemas, events) import nothing from the runtime, apps or adapters"
+type = "forbidden"
+source_modules = ["thymira.schemas", "thymira.events"]
+forbidden_modules = [
+    "thymira.state",
+    "thymira.policies",
+    "thymira.tools",
+    "thymira.agents",
+    "thymira.thy",
+    "thymira.mira",
+    "thymira.core",
+    "thymira.api",
+    "thymira.cli",
+    "thymira.web",
+]
+
+[[tool.importlinter.contracts]]
+name = "Clients own no state: the CLI and the web console talk to the Thymira API over HTTP only"
+type = "forbidden"
+source_modules = ["thymira.cli", "thymira.web"]
+forbidden_modules = [
+    "thymira.state",
+    "thymira.policies",
+    "thymira.tools",
+    "thymira.agents",
+    "thymira.thy",
+    "thymira.mira",
+    "thymira.core",
+    "thymira.api",
+]

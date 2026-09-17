@@ -1,0 +1,40 @@
+{
+  "id": "pack_00000000000000000000000000000001",
+  "name": "methodology-base",
+  "version": "1.0",
+  "applicability_rules_version": "1.0",
+  "jurisdictions": ["*"],
+  "risk_method": {
+    "id": "mira-base-risk",
+    "version": "1.0",
+    "required_profile_facts": ["data_categories", "potential_consequences"],
+    "rules": [
+      {
+        "id": "RISK-HIGH-SPECIAL-CATEGORY",
+        "category": "special_category_data",
+        "risk_level": "high",
+        "sensitive_attributes_any": ["biometric_data", "disability", "health_data"]
+      },
+      {
+        "id": "RISK-MEDIUM-SENSITIVE-DATA",
+        "category": "sensitive_data",
+        "risk_level": "medium",
+        "sensitive_attributes_any": ["*"]
+      },
+      {
+        "id": "RISK-LOW-NO-SENSITIVE-DATA",
+        "category": "declared_no_sensitive_data",
+        "risk_level": "low",
+        "requires_no_sensitive_attributes": true
+      }
+    ]
+  },
+  "controls": [
+    {
+      "id": "METHODOLOGY-EVIDENCE-001",
+      "title": "Methodology evidence is present, verified, and fresh",
+      "required_evidence_kinds": ["event"],
+      "max_age_days": 30
+    }
+  ]
+}

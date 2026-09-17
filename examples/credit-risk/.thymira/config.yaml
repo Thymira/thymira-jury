@@ -1,0 +1,18 @@
+# Thymira project context (see docs/architecture/e2e-baseline-v2.md, section 15).
+
+project:
+  name: credit-risk
+  domain: credit_risk
+experiments:
+  tracking: mlflow
+agents:
+  default: thy
+governance:
+  audit_required: true
+  frameworks:
+  - EU_AI_ACT
+  - CREDIT_RISK
+datasets:
+- name: german_credit
+  path: data/applications.csv
+  target: is_high_risk

@@ -1,0 +1,30 @@
+# Credit-risk overlay: evaluated before the base rules. Ported from the domain part of the
+# thesis policy pack (fraude_aml.json).
+name: credit-risk
+version: "1.0"
+description: Credit-risk and GDPR-specific rules layered on the base policy.
+
+capability_rules:
+  - id: CR-001
+    description: Training with sensitive attributes requires human approval.
+    risk_factors: [sensitive_attributes]
+    risk_tags: [model_comparison, hyperparameter_search, model_training]
+    decision: REQUIRE_HUMAN_REVIEW
+    reason: "Training uses sensitive data: a human must validate the justification (GDPR art. 9)."
+    # The rule's own decision reviews the training or comparison call. It deliberately carries no
+    # run-wide requires_human_review constraint: that constraint is merged into execution.start
+    # for every registered capability the rule matches and would put a human in front of every
+    # tool call of the Run, read-only ones included (decided 2026-09-13).
+
+finding_rules:
+  - id: CR-101
+    description: Data leakage invalidates a credit model.
+    control_ids: [A11, A14, A20]
+    decision: BLOCK
+    reason: "Evidence of train/test leakage: the model's metrics cannot be trusted."
+  - id: CR-102
+    description: High-severity credit-risk findings always reach a human.
+    frameworks: [CREDIT_RISK, EU_AI_ACT]
+    min_severity: HIGH
+    decision: REQUIRE_HUMAN_REVIEW
+    reason: "A high-severity regulatory finding requires human review before the run completes."

@@ -1,0 +1,100 @@
+# Install once: just hooks   (or: uv run pre-commit install --install-hooks)
+# Run on demand: uv run pre-commit run --all-files
+minimum_pre_commit_version: "4.6.0"
+default_language_version:
+  python: python3.13
+fail_fast: false
+# Datasets and run artefacts are never rewritten by hooks (trailing spaces inside quoted
+# CSV fields are data, not noise).
+exclude: ^(data/|runs/|\.pytest-tmp/)
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-illegal-windows-names
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: debug-statements
+      - id: name-tests-test
+        args: [--pytest-test-first]
+        # These modules provide shared test support; they do not contain collected tests.
+        exclude: |
+          (?x)^(
+            tests/(conftest|fakes)\.py|
+            tests/tooling/conftest\.py|
+            tests/thymira/(fixtures_.*|repo_conformance|docker_support|api_support|acceptance/session)\.py
+          )$
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.3
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.12.5
+    hooks:
+      - id: uv-lock
+
+  # GitHub Actions security linter: pinned actions, least privilege, template injection, …
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.9.0
+    hooks:
+      - id: zizmor
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.38.0
+    hooks:
+      - id: yamllint
+
+  # Project-wide checks run from the uv environment (they need the project installed).
+  - repo: local
+    hooks:
+      - id: import-linter
+        name: import-linter (architecture contracts)
+        entry: uv run python scripts/lint_imports.py
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: ty-ratchet
+        name: ty ratchet (diagnostics must not grow)
+        entry: uv run python scripts/ty_ratchet.py
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: validate-skills
+        name: validate agent skills
+        entry: uv run python scripts/validate_skills.py
+        language: system
+        pass_filenames: false
+        files: ^\.agents/skills/
+      - id: check-roadmap
+        name: the two roadmap documents agree
+        entry: uv run python scripts/check_roadmap.py
+        language: system
+        pass_filenames: false
+        files: ^docs/roadmap/
+      - id: sync-skills
+        name: skill copies in .claude/skills are current
+        entry: uv run python scripts/sync_skills.py --check
+        language: system
+        pass_filenames: false
+        files: ^(\.agents|\.claude)/skills/
+
+ci:
+  autofix_prs: false
+  autoupdate_schedule: monthly
+  skip: [import-linter, ty-ratchet, validate-skills, check-roadmap, sync-skills]
