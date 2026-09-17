@@ -1,0 +1,43 @@
+[project]
+name = "thymira-api"
+version = "0.1.0"
+description = "Thymira API (FastAPI): POST /runs, GET /runs/{id}, POST /runs/{id}/resume, GET /runs/{id}/events, GET /runs/{id}/audit, GET /runs/{id}/experiments."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+dependencies = [
+    "thymira-core",
+    "thymira-mira",
+    "thymira-policies",
+    "thymira-state",
+    "thymira-tools",
+    "fastapi>=0.115,<1",
+    "python-dotenv>=1.0,<2",
+    "uvicorn>=0.30,<1",
+    "thymira-schemas",
+    "thymira-observability",
+    "opentelemetry-api>=1.27,<2",
+    "opentelemetry-sdk>=1.27,<2",
+    "opentelemetry-instrumentation-fastapi>=0.48b0,<1",
+    "opentelemetry-exporter-otlp-proto-http>=1.27,<2",
+]
+
+[project.scripts]
+thymira-api = "thymira.api.server:main"
+
+[tool.uv.sources]
+thymira-observability = { workspace = true }
+thymira-mira = { workspace = true }
+thymira-core = { workspace = true }
+thymira-policies = { workspace = true }
+thymira-state = { workspace = true }
+thymira-tools = { workspace = true }
+thymira-schemas = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "thymira.api"
+namespace = true

@@ -1,0 +1,50 @@
+[project]
+name = "thymira-tools"
+version = "0.1.0"
+description = "Tool Manager and Permission Policy in front of every tool: run_python, read/write/list files, git_*, MLflow (start_run/log_param/log_metric/log_artifact/end_run); MCP is the exposure standard."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+dependencies = [
+    "duckdb>=1,<2",
+    "joblib>=1.4,<2",
+    "matplotlib>=3.9,<4",
+    "mcp>=1,<2",
+    "mlflow>=2.16,<3",
+    "pandas>=2.2,<3",
+    "polars>=1,<2",
+    "scikit-learn>=1.5,<2",
+    "scipy>=1.13,<2",
+    "statsmodels>=0.14,<1",
+    "pydantic>=2,<3",
+    "thymira-schemas",
+    "thymira-events",
+    "thymira-policies",
+    "thymira-state",
+    "threadpoolctl>=3.6,<4",
+    "regex>=2024,<2027",
+    "markdown>=3,<4",
+    "xhtml2pdf>=0.2,<0.3",
+    "pypdf>=6,<7",
+    "pillow>=10,<13",
+    "nbformat>=5.10,<6",
+    "nbclient>=0.10,<1",
+    "ipykernel>=6.29,<7",
+    "jupyter-client>=8,<9",
+    "xgboost>=2,<3",
+    "seaborn>=0.13,<1",
+]
+
+[tool.uv.sources]
+thymira-schemas = { workspace = true }
+thymira-events = { workspace = true }
+thymira-policies = { workspace = true }
+thymira-state = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "thymira.tools"
+namespace = true

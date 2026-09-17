@@ -1,0 +1,21 @@
+[project]
+name = "thymira-events"
+version = "0.1.0"
+description = "Event model, canonical hashing, redaction and the hash-chained event log for the Event API (run.*, agent.*, tool.*, artifact.*, audit.*, policy.*, human.* events)."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+dependencies = [
+    "thymira-schemas",
+]
+
+[tool.uv.sources]
+thymira-schemas = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "thymira.events"
+namespace = true

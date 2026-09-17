@@ -1,0 +1,33 @@
+name: Dependency audit
+
+# Known vulnerabilities in the locked dependency tree. Runs on a schedule and on main, not on
+# every pull request: an unfixable CVE in a transitive dependency must not block unrelated work.
+on:
+  schedule:
+    - cron: "23 5 * * 1"   # weekly, Monday 05:23 UTC
+  push:
+    branches: [main]
+    paths: [uv.lock]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pip-audit:
+    name: pip-audit over uv.lock
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+      - name: Export the runtime dependency tree (no dev groups, no workspace members)
+        run: >-
+          uv export --locked --all-packages --no-dev --no-emit-workspace --no-hashes
+          --format requirements-txt -o requirements-audit.txt
+      - name: Audit
+        run: uvx pip-audit --requirement requirements-audit.txt --strict --progress-spinner off

@@ -1,0 +1,83 @@
+{
+  "version": "1.1",
+  "entries": [
+    {
+      "source_id": "eu-ai-act-2024-art-11",
+      "framework": "EU_AI_ACT",
+      "location": "Regulation (EU) 2024/1689, Article 11 and Annex IV",
+      "text": "The AI Act requires the provider of a high-risk AI system to draw up technical documentation before the system is placed on the market or put into service, and to keep it up to date. The documentation must demonstrate that the system complies with the requirements of the Act and give authorities the information needed to assess that compliance; its minimum content is set out in Annex IV, covering the system's design, development, capabilities, limitations and monitoring."
+    },
+    {
+      "source_id": "eu-ai-act-2024-art-12",
+      "framework": "EU_AI_ACT",
+      "location": "Regulation (EU) 2024/1689, Article 12",
+      "text": "The AI Act requires high-risk AI systems to technically allow for the automatic recording of events (logs) over the lifetime of the system. The logging capabilities must ensure a level of traceability appropriate to the intended purpose of the system, and support the identification of situations that may result in the system presenting a risk or undergoing a substantial modification."
+    },
+    {
+      "source_id": "eu-ai-act-2024-art-14",
+      "framework": "EU_AI_ACT",
+      "location": "Regulation (EU) 2024/1689, Article 14",
+      "text": "The AI Act requires high-risk AI systems to be designed and developed so that they can be effectively overseen by natural persons during the period in which they are in use. The human oversight measures must enable the persons to understand the system's capacities and limitations, to remain aware of automation bias, to correctly interpret the output, and to decide not to use the system or to override, intervene in, or stop it."
+    },
+    {
+      "source_id": "eu-ai-act-2024-annex-iii-5b-creditworthiness",
+      "framework": "CREDIT_RISK",
+      "location": "Regulation (EU) 2024/1689, Article 2(8), Article 6(2)-(3) and Annex III, point 5(b)",
+      "text": "Within the AI Act's scope, Annex III lists AI systems intended to evaluate the creditworthiness of natural persons or establish their credit score as high-risk systems, except systems used to detect financial fraud. Article 2(8) excludes research, testing and development activities concerning AI systems or models before placement on the market or putting into service, except testing in real-world conditions. Article 6(3)'s limited derogation requires both no significant risk of harm and no material influence on a decision outcome, as well as at least one of the conditions in points (a) to (d); an Annex III system that profiles natural persons remains high-risk."
+    },
+    {
+      "source_id": "consumer-credit-directive-2023-art-18-data",
+      "framework": "CREDIT_RISK",
+      "location": "Directive (EU) 2023/2225, Article 18(3)-(4)",
+      "text": "For a consumer creditworthiness assessment, Member States must require relevant and accurate information about income, expenses, and other necessary and proportionate financial and economic circumstances. The information must not include the special categories of personal data in GDPR Article 9(1), and social networks are not an external information source for this assessment. Creditors must document and maintain their assessment procedures and the information used."
+    },
+    {
+      "source_id": "consumer-credit-directive-2023-art-18-automated",
+      "framework": "CREDIT_RISK",
+      "location": "Directive (EU) 2023/2225, Article 18(8)-(9) and Article 48",
+      "text": "Under national implementing measures that Member States apply from 20 November 2026, Article 18 requires, where a consumer creditworthiness assessment uses automated processing of personal data, a right to human intervention, a clear and comprehensible explanation of the assessment including its logic, risks, significance and effects, an opportunity for the consumer to express a point of view, and a review of both the assessment and the credit decision. A rejected applicant must be informed of the rejection and, where applicable, the automated processing, human assessment right, and contest procedure."
+    },
+    {
+      "source_id": "gdpr-2016-art-5",
+      "framework": "GDPR",
+      "location": "Regulation (EU) 2016/679, Article 5",
+      "text": "The GDPR requires personal data to be processed lawfully, fairly and transparently; collected for specified, explicit and legitimate purposes; adequate, relevant and limited to what is necessary (data minimisation); accurate; kept no longer than necessary (storage limitation); and processed securely to ensure integrity and confidentiality. The controller is responsible for, and must be able to demonstrate, compliance with these principles (accountability)."
+    },
+    {
+      "source_id": "gdpr-2016-art-9",
+      "framework": "GDPR",
+      "location": "Regulation (EU) 2016/679, Article 9",
+      "text": "The GDPR prohibits the processing of special categories of personal data -- including data revealing racial or ethnic origin, political opinions, religious beliefs, health data, and biometric data processed to uniquely identify a natural person -- unless one of the enumerated conditions applies, such as the data subject's explicit consent or a substantial public interest, together with appropriate safeguards."
+    },
+    {
+      "source_id": "gdpr-2016-art-22",
+      "framework": "GDPR",
+      "location": "Regulation (EU) 2016/679, Article 22",
+      "text": "The GDPR grants a data subject the right not to be subject to a decision based solely on automated processing, including profiling, which produces legal effects concerning them or similarly significantly affects them. Where such processing is permitted, the controller must implement suitable safeguards, including at least the right to obtain human intervention, to express a point of view, and to contest the decision."
+    },
+    {
+      "source_id": "methodology-leakage",
+      "framework": "METHODOLOGY",
+      "location": "Thymira ADR-0002, Appendix B (leakage safety)",
+      "text": "The methodology forbids fitting any transformation -- winsorising, imputation, or encoding -- on the target or on a sensitive attribute, because doing so leaks information into the model. It also requires reporting leakage indicators: an exact copy of the target, an absolute correlation of at least 0.95 with the target, and identifier-suspected columns that are nonetheless correlated with the target."
+    },
+    {
+      "source_id": "methodology-split-integrity",
+      "framework": "METHODOLOGY",
+      "location": "Thymira ADR-0002, Appendix B (split and test discipline)",
+      "text": "The methodology requires de-duplicating records before splitting, and a split with no overlap between partitions, complete coverage of the data, non-empty partitions, and per-class allocation. The test partition is read exactly once, for the final evaluation, using the threshold selected out of fold, so that no test information influences model selection."
+    },
+    {
+      "source_id": "methodology-evaluation-rigor",
+      "framework": "METHODOLOGY",
+      "location": "Thymira ADR-0002, Appendix B (evaluation rigour)",
+      "text": "The methodology requires cross-validation preprocessing to be fold-local and shared by every candidate model, a trivial baseline trained on the identical folds so that the reported metrics can be interpreted, and subgroup (fairness) disparity reported for each sensitive attribute."
+    },
+    {
+      "source_id": "methodology-reproducibility",
+      "framework": "METHODOLOGY",
+      "location": "Thymira ADR-0002, Appendix B (reproducibility)",
+      "text": "The methodology requires reproducibility metadata to accompany every model: the random seed, the exact library versions, single-thread execution, and the explicit estimator arguments used. The run additionally captures its environment (provenance) at start, so that a result can be reproduced and independently checked."
+    }
+  ]
+}

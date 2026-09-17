@@ -1,0 +1,144 @@
+{
+  "schema": "thymira.package-invariants/1",
+  "packages": [
+    {
+      "distribution": "thymira-schemas",
+      "import": "thymira.schemas",
+      "owner": "P1",
+      "status": "implemented",
+      "registry": "thymira.schemas public contract models",
+      "checker": "pydantic model validation",
+      "invariant": "closed identifiers and enums are validated by frozen contract models"
+    },
+    {
+      "distribution": "thymira-events",
+      "import": "thymira.events",
+      "owner": "P1",
+      "status": "implemented",
+      "registry": "thymira.events.EventLog",
+      "checker": "thymira.events.verify_events",
+      "invariant": "the authoritative event stream is ordered, hash chained and replayable"
+    },
+    {
+      "distribution": "thymira-core",
+      "import": "thymira.core",
+      "owner": "P1",
+      "status": "implemented",
+      "registry": "thymira.core.RunController",
+      "checker": "thymira.core.RunController.current_state",
+      "invariant": "persistent Run transitions are authorized and written by one controller"
+    },
+    {
+      "distribution": "thymira-state",
+      "import": "thymira.state",
+      "owner": "P1/P3",
+      "status": "implemented",
+      "registry": "thymira.state.LocalArtifactStore",
+      "checker": "thymira.state.LocalArtifactStore.verify",
+      "invariant": "active artifact bytes agree with their manifest digests"
+    },
+    {
+      "distribution": "thymira-observability",
+      "import": "thymira.observability",
+      "owner": "P1",
+      "status": "scoped-absence",
+      "registry": "none",
+      "checker": "none",
+      "invariant": "observability is non-authoritative and cannot decide a Run",
+      "reason": "traces are an optional projection; the authoritative event and audit checks own relationships"
+    },
+    {
+      "distribution": "thymira-policies",
+      "import": "thymira.policies",
+      "owner": "P4",
+      "status": "implemented",
+      "registry": "thymira.policies.Gate",
+      "checker": "thymira.policies.PolicyEngine",
+      "invariant": "policy decisions and human answers are recorded before authorization"
+    },
+    {
+      "distribution": "thymira-tools",
+      "import": "thymira.tools",
+      "owner": "P3",
+      "status": "implemented",
+      "registry": "thymira.tools.ToolRegistry",
+      "checker": "thymira.mira.checks.termination_evidence.check_termination_evidence",
+      "checker_import": "thymira.mira.checks.termination_evidence",
+      "checker_name": "check_termination_evidence",
+      "independent_checker": "thymira.mira.checks.controls._a30_independent_relationship",
+      "invariant": "requested sandbox constraints agree with the observed backend probe",
+      "relationship_id": "A30"
+    },
+    {
+      "distribution": "thymira-agents",
+      "import": "thymira.agents",
+      "owner": "P2/P4",
+      "status": "pending",
+      "registry": "thymira.agents.llm provider boundary",
+      "checker": "pending request-ledger checker",
+      "invariant": "the reconstructed provider request equals the request sent to the model",
+      "relationship_id": "F1.5",
+      "reason": "the request ledger owner is landing the durable sent-request record"
+    },
+    {
+      "distribution": "thymira-thy",
+      "import": "thymira.thy",
+      "owner": "P2",
+      "status": "pending",
+      "registry": "thymira.thy delegation and task registry",
+      "checker": "thymira.mira.checks.subagent_settlement.check_subagent_settlement",
+      "invariant": "one durable settlement agrees with lifecycle identity and parent rendering",
+      "relationship_id": "A31",
+      "reason": "the settlement control lands with the delegation lifecycle owner"
+    },
+    {
+      "distribution": "thymira-mira",
+      "import": "thymira.mira",
+      "owner": "P4",
+      "status": "implemented",
+      "registry": "thymira.mira.checks.CONTROLS",
+      "checker": "thymira.mira.checks.audit_run",
+      "invariant": "MIRA recomputes relationship controls from durable events and evidence"
+    },
+    {
+      "distribution": "thymira-api",
+      "import": "thymira.api",
+      "owner": "P1",
+      "status": "scoped-absence",
+      "registry": "none",
+      "checker": "none",
+      "invariant": "the API owns typed transport only and delegates state and authorization",
+      "reason": "API handlers are boundary consumers, not independent evidence producers"
+    },
+    {
+      "distribution": "thymira-cli",
+      "import": "thymira.cli",
+      "owner": "P5",
+      "status": "scoped-absence",
+      "registry": "none",
+      "checker": "none",
+      "invariant": "the CLI owns no Run state and calls the API over HTTP",
+      "reason": "the CLI is a thin client and cannot provide an independent runtime observation"
+    },
+    {
+      "distribution": "thymira-web",
+      "import": "thymira.web",
+      "owner": "P5",
+      "status": "scoped-absence",
+      "registry": "none",
+      "checker": "none",
+      "invariant": "the web console owns no Run state and forwards only the caller's own credential to the API",
+      "reason": "the console is a thin client and cannot provide an independent runtime observation"
+    }
+  ],
+  "scoped_absences": [
+    {
+      "path": "adapters/vscode, adapters/opencode, adapters/claude-code, adapters/codex, adapters/generic",
+      "reason": "README placeholders; no distribution or runtime package is claimed"
+    },
+    {
+      "path": "packages/sdk-*, services/*, infrastructure/*",
+      "reason": "README placeholders; no distribution or runtime package is claimed"
+    }
+  ]
+}

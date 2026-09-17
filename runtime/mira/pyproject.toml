@@ -1,0 +1,39 @@
+[project]
+name = "thymira-mira"
+version = "0.1.0"
+description = "MIRA — the independent audit / governance orchestrator (MiraGraph: Audit Preparation -> parallel audit agents -> Findings) feeding the Policy Engine; reads execution events and evidence, never modifies the workspace."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+dependencies = [
+    "langgraph>=1.2,<2",
+    "pyyaml>=6,<7",
+    "psycopg[binary]>=3.2,<4",
+    "thymira-schemas",
+    "thymira-agents",
+    "thymira-policies",
+    "thymira-state",
+    "thymira-events",
+    "thymira-observability",
+    "thymira-tools",
+    "pydantic>=2,<3",
+    "polars>=1,<2",
+    "regex>=2024,<2027",
+]
+
+[tool.uv.sources]
+thymira-observability = { workspace = true }
+thymira-schemas = { workspace = true }
+thymira-agents = { workspace = true }
+thymira-policies = { workspace = true }
+thymira-state = { workspace = true }
+thymira-events = { workspace = true }
+thymira-tools = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "thymira.mira"
+namespace = true

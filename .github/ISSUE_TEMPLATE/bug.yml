@@ -1,0 +1,48 @@
+name: Bug
+description: Something behaves differently from what the documentation or the roadmap promises.
+title: "bug: "
+labels: [bug]
+body:
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity (roadmap triage)
+      options:
+        - P0 — blocks the demo or the daily integration
+        - P1 — important, must be fixed this week
+        - P2 — cosmetic or low impact
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area / owner
+      options:
+        - runtime/core, state, api, contracts (P1)
+        - runtime/thy, agents (P2)
+        - runtime/tools, sandbox, MLflow (P3)
+        - runtime/mira, policies (P4)
+        - adapters/cli, apps/web, tests, docs (P5)
+        - tooling / CI / repository
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: The exact command or test, on which commit. A failing test node is the best reproduction.
+      placeholder: "uv run pytest tests/thymira/test_policies.py::test_x -x  (commit abc1234)"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Traceback, the run's event log excerpt, `audit_run` report, CI link. Redact keys and personal data.
+      render: text

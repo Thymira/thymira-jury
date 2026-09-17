@@ -1,0 +1,114 @@
+# Base governance policy every project inherits. Governance as data: changing a rule never
+# requires code. Rules are evaluated in order; among capability rules a matching BLOCK wins.
+# Ported from the thesis policy pack (generic part of fraude_aml.json), decisions re-mapped:
+# allow -> PASS, needs_approval -> REQUIRE_HUMAN_REVIEW, blocked -> BLOCK; WARNING is new.
+name: base
+version: "1.0"
+description: Generic governance rules (the LLM proposes, the Policy Engine decides).
+
+action_rules:
+  - id: GOV-000
+    description: Run-control requests with no external effect can proceed under the recorded policy.
+    action_types: [request_information, pause_run, resume_run]
+    decision: PASS
+    reason: "The requested local Run-control transition has no external effect."
+  - id: GOV-007
+    description: Execution starts only through the recorded Gate decision.
+    action_types: [execution.start]
+    decision: PASS
+    reason: "Execution may start with the Gate-authorised execution constraints."
+  - id: GOV-001
+    description: Models are never deployed and final decisions are never automated without a human.
+    action_types: [deploy_model, automated_final_decision]
+    decision: BLOCK
+    reason: >-
+      Prohibited: the system neither deploys models nor takes final decisions autonomously
+      (EU AI Act, high-risk systems).
+  - id: GOV-002
+    description: The final decision of a run always passes through a human.
+    action_types: [final_decision]
+    decision: REQUIRE_HUMAN_REVIEW
+    reason: "Human oversight is mandatory before closing a run (EU AI Act art. 14)."
+  - id: GOV-006
+    description: Requests to obtain a human approval or review MIRA findings require that review.
+    action_types: [request_approval, review_findings]
+    decision: REQUIRE_HUMAN_REVIEW
+    reason: "A human must review this Run-control request before it changes the Run state."
+
+default_decision: REQUIRE_HUMAN_REVIEW
+default_reason: "Action not covered by the policy: when in doubt, ask a human."
+minimum_risk_confidence: 0.75
+
+capability_rules:
+  - id: GOV-003
+    description: A tool with any external effect is blocked.
+    external_effects: ["*"]
+    decision: BLOCK
+    reason: "The tool declares external effects; this policy only authorises local capabilities."
+  - id: GOV-004
+    description: Prohibited technical tags prevail over any permission.
+    risk_tags: [prohibited, prohibited_operation]
+    decision: BLOCK
+    reason: "The tool declares a technical tag the policy prohibits."
+  - id: GOV-005
+    description: Read-only local tools without declared side effects may run.
+    external_effects: []
+    side_effects: []
+    decision: PASS
+    reason: "Local execution of a registered read-only tool without declared effects."
+    execution_constraints:
+      local_execution_only: true
+  - id: GOV-009
+    description: Tools that only persist their own bounded report inside the workspace may run.
+    external_effects: []
+    side_effects: [artifact_write]
+    decision: PASS
+    reason: "Local execution of a registered tool that only writes its own report artifact."
+    execution_constraints:
+      local_execution_only: true
+  - id: GOV-008
+    description: Local tools that write arbitrary files or run code require human review.
+    external_effects: []
+    side_effects: [workspace_write]
+    decision: REQUIRE_HUMAN_REVIEW
+    reason: "The tool declares local side effects; a human must review the execution."
+
+capability_default_decision: REQUIRE_HUMAN_REVIEW
+capability_default_reason: "Capability not covered by the policy: requires approval."
+
+finding_rules:
+  - id: GOV-101
+    description: A critical finding blocks the run.
+    min_severity: CRITICAL
+    decision: BLOCK
+    reason: "A critical audit finding was raised."
+  - id: GOV-102
+    description: A high-severity finding without evidence needs a human.
+    min_severity: HIGH
+    evidence: missing
+    decision: REQUIRE_HUMAN_REVIEW
+    reason: "A high-severity finding lacks verifiable evidence; a human must assess it."
+  - id: GOV-103
+    description: A confident high-severity finding needs a human.
+    min_severity: HIGH
+    min_confidence: 0.9
+    decision: REQUIRE_HUMAN_REVIEW
+    reason: "A high-severity finding with high confidence requires human review."
+  - id: GOV-103b
+    description: Every high-severity finding needs a human, whatever it claims about itself.
+    # The catch-all rung of the ladder. GOV-102 and GOV-103 each carry a condition, so a HIGH
+    # finding that carries evidence *and* whose author self-assessed below GOV-103's threshold
+    # used to fall through to GOV-104 and decide WARNING -- more leniently than the same finding
+    # with no evidence at all. Confidence is an audit agent's own output and must never relax an
+    # authorization, so this rule matches HIGH unconditionally; the engine resolves the overlap
+    # with GOV-102/103/104 by precedence, so the strictest matching rung always decides.
+    min_severity: HIGH
+    decision: REQUIRE_HUMAN_REVIEW
+    reason: "A high-severity audit finding requires human review before the run continues."
+  - id: GOV-104
+    description: Medium findings are surfaced as warnings.
+    min_severity: MEDIUM
+    decision: WARNING
+    reason: "Medium-severity findings were raised; review them before relying on the result."
+
+findings_default_decision: WARNING

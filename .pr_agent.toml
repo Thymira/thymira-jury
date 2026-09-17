@@ -1,0 +1,30 @@
+# PR-Agent (https://github.com/The-PR-Agent/pr-agent) repository configuration.
+# Only overrides are listed; everything else uses the tool defaults.
+
+[config]
+response_language = "en-US"
+
+[pr_reviewer]
+require_tests_review = true
+require_security_review = true
+require_estimate_effort_to_review = true
+extra_instructions = """
+Review against AGENTS.md ("Code review rules"). In particular: an LLM output must never
+become an authorization (only PolicyGate authorizes); skills must not import the orchestrator;
+audit code reads persisted artifacts only; no secrets or PII in traces; new behaviour needs
+tests in the right lane (unit vs slow/integration); CHANGELOG.md [Unreleased] is updated for
+user-visible changes; everything new is written in English.
+"""
+
+[pr_description]
+enable_pr_diagram = true
+publish_labels = false
+
+[pr_code_suggestions]
+extra_instructions = """
+Prefer suggestions that keep runtime behaviour unchanged and respect the import-linter
+layers. Do not suggest reformatting; ruff handles formatting.
+"""
+
+[ignore]
+glob = ["uv.lock", ".claude/skills/**", "data/**", "runs/**", ".ty-baseline.json"]

@@ -1,0 +1,748 @@
+[
+ {
+  "description": "Start a local experiment tracker run.",
+  "name": "mlflow_start_run",
+  "parameters_json_schema": {
+   "description": "Arguments for starting a tracker run.",
+   "properties": {
+    "description": {
+     "description": "Clear, concise description of what this call does in active voice, 5-10 words (shown in the UI and recorded as evidence). Examples: \"Profile missing values per column\"; \"Train the logistic-regression baseline\"; \"Write the feature-engineering script\".",
+     "maxLength": 200,
+     "minLength": 1,
+     "title": "Description",
+     "type": "string"
+    },
+    "experiment_name": {
+     "default": "default",
+     "minLength": 1,
+     "title": "Experiment Name",
+     "type": "string"
+    },
+    "tags": {
+     "additionalProperties": {
+      "type": "string"
+     },
+     "title": "Tags",
+     "type": "object"
+    }
+   },
+   "required": [
+    "description"
+   ],
+   "title": "StartRunArguments",
+   "type": "object"
+  }
+ },
+ {
+  "description": "Log parameters to a local tracker run: one with key/value, or several in one call with params={name: value}. Prefer the batch form; every call costs a turn.",
+  "name": "mlflow_log_param",
+  "parameters_json_schema": {
+   "description": "Arguments for logging one parameter, or several at once through ``params``.",
+   "properties": {
+    "description": {
+     "description": "Clear, concise description of what this call does in active voice, 5-10 words (shown in the UI and recorded as evidence). Examples: \"Profile missing values per column\"; \"Train the logistic-regression baseline\"; \"Write the feature-engineering script\".",
+     "maxLength": 200,
+     "minLength": 1,
+     "title": "Description",
+     "type": "string"
+    },
+    "key": {
+     "anyOf": [
+      {
+       "minLength": 1,
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Key"
+    },
+    "params": {
+     "additionalProperties": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "integer"
+       },
+       {
+        "type": "number"
+       },
+       {
+        "type": "boolean"
+       }
+      ]
+     },
+     "description": "Several parameters in one call: {name: value}. Use instead of key/value.",
+     "title": "Params",
+     "type": "object"
+    },
+    "run_id": {
+     "minLength": 1,
+     "title": "Run Id",
+     "type": "string"
+    },
+    "value": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "integer"
+      },
+      {
+       "type": "number"
+      },
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Value"
+    }
+   },
+   "required": [
+    "description",
+    "run_id"
+   ],
+   "title": "LogParamArguments",
+   "type": "object"
+  }
+ },
+ {
+  "description": "Log metrics to a local tracker run: one with key/value, or several in one call with metrics={name: number}. Prefer the batch form; every call costs a turn.",
+  "name": "mlflow_log_metric",
+  "parameters_json_schema": {
+   "description": "Arguments for logging one metric, or several at once through ``metrics``.",
+   "properties": {
+    "description": {
+     "description": "Clear, concise description of what this call does in active voice, 5-10 words (shown in the UI and recorded as evidence). Examples: \"Profile missing values per column\"; \"Train the logistic-regression baseline\"; \"Write the feature-engineering script\".",
+     "maxLength": 200,
+     "minLength": 1,
+     "title": "Description",
+     "type": "string"
+    },
+    "key": {
+     "anyOf": [
+      {
+       "minLength": 1,
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Key"
+    },
+    "metrics": {
+     "additionalProperties": {
+      "type": "number"
+     },
+     "description": "Several metrics in one call: {name: number}. Use instead of key/value.",
+     "title": "Metrics",
+     "type": "object"
+    },
+    "run_id": {
+     "minLength": 1,
+     "title": "Run Id",
+     "type": "string"
+    },
+    "value": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Value"
+    }
+   },
+   "required": [
+    "description",
+    "run_id"
+   ],
+   "title": "LogMetricArguments",
+   "type": "object"
+  }
+ },
+ {
+  "description": "Copy a workspace artifact into a local tracker run.",
+  "name": "mlflow_log_artifact",
+  "parameters_json_schema": {
+   "description": "Arguments for logging a workspace artifact.",
+   "properties": {
+    "description": {
+     "description": "Clear, concise description of what this call does in active voice, 5-10 words (shown in the UI and recorded as evidence). Examples: \"Profile missing values per column\"; \"Train the logistic-regression baseline\"; \"Write the feature-engineering script\".",
+     "maxLength": 200,
+     "minLength": 1,
+     "title": "Description",
+     "type": "string"
+    },
+    "path": {
+     "minLength": 1,
+     "title": "Path",
+     "type": "string"
+    },
+    "run_id": {
+     "minLength": 1,
+     "title": "Run Id",
+     "type": "string"
+    }
+   },
+   "required": [
+    "description",
+    "run_id",
+    "path"
+   ],
+   "title": "LogArtifactArguments",
+   "type": "object"
+  }
+ },
+ {
+  "description": "Finish a local tracker run.",
+  "name": "mlflow_end_run",
+  "parameters_json_schema": {
+   "description": "Arguments for ending a tracker run.",
+   "properties": {
+    "description": {
+     "description": "Clear, concise description of what this call does in active voice, 5-10 words (shown in the UI and recorded as evidence). Examples: \"Profile missing values per column\"; \"Train the logistic-regression baseline\"; \"Write the feature-engineering script\".",
+     "maxLength": 200,
+     "minLength": 1,
+     "title": "Description",
+     "type": "string"
+    },
+    "run_id": {
+     "minLength": 1,
+     "title": "Run Id",
+     "type": "string"
+    },
+    "status": {
+     "default": "FINISHED",
+     "minLength": 1,
+     "title": "Status",
+     "type": "string"
+    }
+   },
+   "required": [
+    "description",
+    "run_id"
+   ],
+   "title": "EndRunArguments",
+   "type": "object"
+  }
+ },
+ {
+  "description": "Execute Python code in a fresh interpreter through the runtime-configured sandbox with a bounded timeout. Nothing persists between calls: write files for anything the next call needs. Non-zero exits are reported as \"[exit code: N]\"; check that marker on every result and investigate a failure before moving on. Declare files created by the code in output_artifacts to publish their raw bytes, including binary .joblib and .png files; do not use read_file for binary outputs. Long output is truncated to its tail. A sandbox or policy refusal means execution is not permitted; do not retry another way.",
+  "name": "run_python",
+  "parameters_json_schema": {
+   "$defs": {
+    "ArtifactKind": {
+     "description": "What an artifact is, independently of its file format.",
+     "enum": [
+      "dataset",
+      "model",
+      "metrics",
+      "report",
+      "plot",
+      "code",
+      "log",
+      "other"
+     ],
+     "title": "ArtifactKind",
+     "type": "string"
+    },
+    "RunPythonOutputArtifact": {
+     "additionalProperties": false,
+     "description": "A raw file produced by ``run_python`` and published to the artifact store.",
+     "properties": {
+      "kind": {
+       "$ref": "#/$defs/ArtifactKind",
+       "default": "other"
+      },
+      "media_type": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "default": null,
+       "title": "Media Type"
+      },
+      "path": {
+       "minLength": 1,
+       "title": "Path",
+       "type": "string"
+      }
+     },
+     "required": [
+      "path"
+     ],
+     "title": "RunPythonOutputArtifact",
+     "type": "object"
+    }
+   },
+   "additionalProperties": false,
+   "description": "Validated arguments for run_python.",
+   "properties": {
+    "code": {
+     "minLength": 1,
+     "title": "Code",
+     "type": "string"
+    },
+    "description": {
+     "description": "Clear, concise description of what this call does in active voice, 5-10 words (shown in the UI and recorded as evidence). Examples: \"Profile missing values per column\"; \"Train the logistic-regression baseline\"; \"Write the feature-engineering script\".",
+     "maxLength": 200,
+     "minLength": 1,
+     "title": "Description",
+     "type": "string"
+    },
+    "output_artifacts": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/RunPythonOutputArtifact"
+     },
+     "maxItems": 64,
+     "title": "Output Artifacts",
+     "type": "array"
+    },
+    "timeout_s": {
+     "default": 30.0,
+     "exclusiveMinimum": 0,
+     "maximum": 300,
+     "title": "Timeout S",
+     "type": "number"
+    }
+   },
+   "required": [
+    "code",
+    "description"
+   ],
+   "title": "RunPythonArguments",
+   "type": "object"
+  }
+ },
+ {
+  "description": "Train and evaluate a deterministic baseline classifier on a registered dataset, track it in the local experiment tracker and save the model and its metrics as artifacts. Use model_artifact_name and metrics_artifact_name when a plan requires exact output paths. Report only the metrics the result carries; never a number you have not seen in the output.",
+  "name": "run_experiment",
+  "parameters_json_schema": {
+   "additionalProperties": false,
+   "description": "Arguments for the deterministic baseline experiment.",
+   "properties": {
+    "code": {
+     "anyOf": [
+      {
+       "maxLength": 100000,
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Code"
+    },
+    "dataset": {
+     "minLength": 1,
+     "title": "Dataset",
+     "type": "string"
+    },
+    "description": {
+     "description": "Clear, concise description of what this call does in active voice, 5-10 words (shown in the UI and recorded as evidence). Examples: \"Profile missing values per column\"; \"Train the logistic-regression baseline\"; \"Write the feature-engineering script\".",
+     "maxLength": 200,
+     "minLength": 1,
+     "title": "Description",
+     "type": "string"
+    },
+    "experiment_name": {
+     "default": "thymira-experiment",
+     "minLength": 1,
+     "title": "Experiment Name",
+     "type": "string"
+    },
+    "metrics_artifact_name": {
+     "anyOf": [
+      {
+       "minLength": 1,
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Metrics Artifact Name"
+    },
+    "model_artifact_name": {
+     "anyOf": [
+      {
+       "minLength": 1,
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Model Artifact Name"
+    },
+    "seed": {
+     "default": 7,
+     "minimum": 0,
+     "title": "Seed",
+     "type": "integer"
+    },
+    "target_column": {
+     "minLength": 1,
+     "title": "Target Column",
+     "type": "string"
+    },
+    "timeout_s": {
+     "default": 120.0,
+     "exclusiveMinimum": 0,
+     "maximum": 600,
+     "title": "Timeout S",
+     "type": "number"
+    }
+   },
+   "required": [
+    "dataset",
+    "target_column",
+    "description"
+   ],
+   "title": "RunExperimentArguments",
+   "type": "object"
+  }
+ },
+ {
+  "description": "Produce deterministic performance and subgroup evidence for a model.",
+  "name": "audit_model",
+  "parameters_json_schema": {
+   "additionalProperties": false,
+   "description": "Arguments for model audit evidence.",
+   "properties": {
+    "dataset": {
+     "minLength": 1,
+     "title": "Dataset",
+     "type": "string"
+    },
+    "description": {
+     "description": "Clear, concise description of what this call does in active voice, 5-10 words (shown in the UI and recorded as evidence). Examples: \"Profile missing values per column\"; \"Train the logistic-regression baseline\"; \"Write the feature-engineering script\".",
+     "maxLength": 200,
+     "minLength": 1,
+     "title": "Description",
+     "type": "string"
+    },
+    "model_artifact": {
+     "minLength": 1,
+     "title": "Model Artifact",
+     "type": "string"
+    },
+    "protected_column": {
+     "minLength": 1,
+     "title": "Protected Column",
+     "type": "string"
+    },
+    "reference_dataset": {
+     "anyOf": [
+      {
+       "minLength": 1,
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Reference Dataset"
+    },
+    "target_column": {
+     "minLength": 1,
+     "title": "Target Column",
+     "type": "string"
+    }
+   },
+   "required": [
+    "model_artifact",
+    "dataset",
+    "description",
+    "target_column",
+    "protected_column"
+   ],
+   "title": "AuditModelArguments",
+   "type": "object"
+  }
+ },
+ {
+  "description": "Compare experiment runs and report the winner by metric.",
+  "name": "compare_models",
+  "parameters_json_schema": {
+   "description": "Arguments for a side-by-side tracker comparison.",
+   "properties": {
+    "description": {
+     "description": "Clear, concise description of what this call does in active voice, 5-10 words (shown in the UI and recorded as evidence). Examples: \"Profile missing values per column\"; \"Train the logistic-regression baseline\"; \"Write the feature-engineering script\".",
+     "maxLength": 200,
+     "minLength": 1,
+     "title": "Description",
+     "type": "string"
+    },
+    "metric": {
+     "default": "accuracy",
+     "minLength": 1,
+     "title": "Metric",
+     "type": "string"
+    },
+    "run_ids": {
+     "items": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "minItems": 2,
+     "title": "Run Ids",
+     "type": "array"
+    }
+   },
+   "required": [
+    "run_ids",
+    "description"
+   ],
+   "title": "CompareModelsArguments",
+   "type": "object"
+  }
+ },
+ {
+  "description": "Report estimator type, parameters and feature weights; a pipeline is reported through its final estimator, alongside its steps and encoded feature names.",
+  "name": "inspect_model",
+  "parameters_json_schema": {
+   "additionalProperties": false,
+   "description": "Arguments for model inspection.",
+   "properties": {
+    "description": {
+     "description": "Clear, concise description of what this call does in active voice, 5-10 words (shown in the UI and recorded as evidence). Examples: \"Profile missing values per column\"; \"Train the logistic-regression baseline\"; \"Write the feature-engineering script\".",
+     "maxLength": 200,
+     "minLength": 1,
+     "title": "Description",
+     "type": "string"
+    },
+    "model_artifact": {
+     "minLength": 1,
+     "title": "Model Artifact",
+     "type": "string"
+    }
+   },
+   "required": [
+    "model_artifact",
+    "description"
+   ],
+   "title": "InspectModelArguments",
+   "type": "object"
+  }
+ },
+ {
+  "description": "Read local experiment tracker runs.",
+  "name": "query_mlflow",
+  "parameters_json_schema": {
+   "description": "Optional tracker query filters.\n\nA filter is either absent or a real id. An empty string used to be neither: it was falsy, so\nthe tracker skipped the filter and returned every run it held, which is the opposite of what a\ncaller asking for run ``\"\"`` wants and the reason ``compare_models``' missing-id guard never\nfired. The tracker now compares against ``None``, and an empty id is refused here, before any\ntool runs.",
+   "properties": {
+    "experiment_name": {
+     "anyOf": [
+      {
+       "minLength": 1,
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Experiment Name"
+    },
+    "run_id": {
+     "anyOf": [
+      {
+       "minLength": 1,
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Run Id"
+    }
+   },
+   "title": "QueryMlflowArguments",
+   "type": "object"
+  }
+ },
+ {
+  "description": "Create or fully replace a UTF-8 text file inside the workspace (mutates the workspace). Overwriting an existing file requires a prior read_file of its current content in this run -- an unread or stale target is refused with FS_READ_REQUIRED or FS_STALE_VERSION, naming the fix; a brand-new path needs no prior read. To change an existing file, read it and provide its complete replacement content. Pass kind to register the file as an Artifact.",
+  "name": "write_file",
+  "parameters_json_schema": {
+   "$defs": {
+    "ArtifactKind": {
+     "description": "What an artifact is, independently of its file format.",
+     "enum": [
+      "dataset",
+      "model",
+      "metrics",
+      "report",
+      "plot",
+      "code",
+      "log",
+      "other"
+     ],
+     "title": "ArtifactKind",
+     "type": "string"
+    }
+   },
+   "description": "Arguments for write_file.",
+   "properties": {
+    "content": {
+     "title": "Content",
+     "type": "string"
+    },
+    "description": {
+     "description": "Clear, concise description of what this call does in active voice, 5-10 words (shown in the UI and recorded as evidence). Examples: \"Profile missing values per column\"; \"Train the logistic-regression baseline\"; \"Write the feature-engineering script\".",
+     "maxLength": 200,
+     "minLength": 1,
+     "title": "Description",
+     "type": "string"
+    },
+    "kind": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/ArtifactKind"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "When set, also register the written file as an Artifact of this kind."
+    },
+    "path": {
+     "minLength": 1,
+     "title": "Path",
+     "type": "string"
+    }
+   },
+   "required": [
+    "path",
+    "content",
+    "description"
+   ],
+   "title": "WriteFileArguments",
+   "type": "object"
+  }
+ },
+ {
+  "description": "Render a Markdown file already in the workspace -- headings, tables, and any image it embeds via a workspace-relative path (![alt](plots/x.png)) -- into a styled PDF, and always register the result as a kind=\"report\" Artifact. Write the Markdown with write_file first; export_pdf reads it back, so use this once the report's text and its referenced plots already exist in the workspace. If the report cites any decimal or percentage figure, evidence_paths naming every JSON file that records it is required: export_pdf refuses immediately, before rendering, when such a citation is present and evidence_paths is empty, or when a cited number resolves to none of the named files -- the same check MIRA's audit would otherwise apply only after the whole Run finishes.",
+  "name": "export_pdf",
+  "parameters_json_schema": {
+   "description": "Arguments for export_pdf.",
+   "properties": {
+    "description": {
+     "description": "Clear, concise description of what this call does in active voice, 5-10 words (shown in the UI and recorded as evidence). Examples: \"Profile missing values per column\"; \"Train the logistic-regression baseline\"; \"Write the feature-engineering script\".",
+     "maxLength": 200,
+     "minLength": 1,
+     "title": "Description",
+     "type": "string"
+    },
+    "evidence_paths": {
+     "default": [],
+     "description": "Names of already-registered JSON artifacts of kind=\"metrics\" whose numbers back every number cited in the Markdown source; a JSON registered under any other kind is refused, because MIRA's audit counts only metrics artifacts. Read from the artifact store, not the workspace file -- if you edited the file since its last registration, re-register it (run_python.output_artifacts or mlflow_log_artifact) before citing it, or the edit will not count as evidence here or in MIRA's later audit. Required whenever the Markdown source cites a decimal or percentage number: left empty, export_pdf refuses to render such a source instead of producing a PDF the audit will later block; given, it refuses to render if the source cites a number none of them record.",
+     "items": {
+      "type": "string"
+     },
+     "maxItems": 16,
+     "title": "Evidence Paths",
+     "type": "array"
+    },
+    "path": {
+     "description": "Workspace-relative path for the rendered PDF.",
+     "minLength": 1,
+     "title": "Path",
+     "type": "string"
+    },
+    "source_path": {
+     "description": "Workspace-relative Markdown file to render.",
+     "minLength": 1,
+     "title": "Source Path",
+     "type": "string"
+    }
+   },
+   "required": [
+    "source_path",
+    "path",
+    "description"
+   ],
+   "title": "ExportPdfArguments",
+   "type": "object"
+  }
+ },
+ {
+  "description": "The Experiment agent's structured output: exactly what the tracker recorded.",
+  "name": "final_result",
+  "parameters_json_schema": {
+   "properties": {
+    "metrics": {
+     "additionalProperties": {
+      "type": "number"
+     },
+     "type": "object"
+    },
+    "model_artifact_id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "parameters": {
+     "additionalProperties": {
+      "type": "string"
+     },
+     "type": "object"
+    },
+    "seed": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "tracker_run_id": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "parameters",
+    "metrics",
+    "tracker_run_id"
+   ],
+   "title": "ExperimentResult",
+   "type": "object"
+  }
+ }
+]

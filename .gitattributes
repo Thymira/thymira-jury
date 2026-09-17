@@ -1,0 +1,25 @@
+# Normalise text to LF in the repository and on checkout on every platform.
+* text=auto eol=lf
+
+*.py    text eol=lf
+*.pyi   text eol=lf
+*.md    text eol=lf
+*.toml  text eol=lf
+*.yaml  text eol=lf
+*.yml   text eol=lf
+*.json  text eol=lf
+*.sh    text eol=lf
+justfile text eol=lf
+Makefile text eol=lf
+
+# Windows-only scripts need CRLF
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Data and binary artefacts: never rewrite line endings, never diff as text
+*.csv     -text
+*.parquet -text binary
+*.joblib  -text binary
+*.npy     -text binary
+*.png     -text binary
+*.pdf     -text binary

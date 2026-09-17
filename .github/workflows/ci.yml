@@ -1,0 +1,195 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+  workflow_dispatch:
+
+# Least privilege by default; jobs that need more declare it themselves.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UV_LOCKED: "1"
+  PYTHONUTF8: "1"
+
+jobs:
+  lock-check:
+    name: uv.lock is current
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+      - run: uv lock --check
+
+  quality:
+    name: lint, types, architecture, skills, workflows, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+      - run: uv sync --locked --all-groups --all-packages
+      - run: uv run ruff check --output-format github .
+      - run: uv run ruff format --check .
+      - run: uv run yamllint --strict .
+      - run: uv run python scripts/lint_imports.py
+      - run: uv run python scripts/ty_ratchet.py --strict
+      - run: uv run python scripts/validate_skills.py
+      - run: uv run python scripts/sync_skills.py --check
+      # Also asserted by tests/tooling/test_check_roadmap.py, but a divergence between the two
+      # roadmap documents should fail as itself and name the disagreement, not as a red test.
+      - run: uv run python scripts/check_roadmap.py
+      - name: Lint the workflows themselves (pinned actions, permissions, injection, cache poisoning)
+        run: uvx zizmor@1.9.0 --format github --no-progress .github/workflows
+      - name: Build every member wheel and check their contents
+        run: |
+          uv build --all-packages
+          uv run python scripts/check_wheel.py
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: wheels
+          path: dist/*.whl
+          retention-days: 7
+
+  secrets:
+    name: no secrets in the changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: TruffleHog over the commit range of this push / pull request
+        uses: trufflesecurity/trufflehog@bcfcf73aaf4759d4dadc2783177c245a02792318 # v3.97.0
+        with:
+          extra_args: --results=verified,unknown
+
+  changelog:
+    name: changelog entry or [skip changelog]
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          python-version: "3.13"
+      - env:
+          BASE_REF: ${{ github.base_ref }}
+        run: >-
+          uv run --no-project python .agents/skills/changelog/scripts/check_changelog.py
+          --base "origin/$BASE_REF" --json
+
+  test:
+    name: tests (fast lane) ${{ matrix.os }} py${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+          python-version: ${{ matrix.python-version }}
+      - run: uv sync --locked --group test --all-packages
+      - run: uv run pytest -m "not slow" -p no:cacheprovider
+
+  test-full:
+    name: tests (full suite, coverage floor)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+          python-version: "3.13"
+      - run: uv sync --locked --group test --all-packages
+      - run: uv run pytest --cov --cov-report=xml --cov-report=term -p no:cacheprovider
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: coverage-xml
+          path: coverage.xml
+          retention-days: 14
+
+  docker:
+    name: container image and execution boundaries
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+      - uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: .
+          push: false
+          load: true
+          tags: |
+            thymira:ci
+            thymira:dev
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Smoke test the entry point (the thymira CLI prints its help and exits 0)
+        run: |
+          # Capture the exit code without letting `set -e` abort on it, then assert it: the CLI
+          # exits 0 on --help. Do not grep for the bare word "thymira" — docker's own failure
+          # text ("Unable to find image 'thymira:ci'") contains it, so a missing image would
+          # pass the very check that exists to catch it. Grep for a phrase only the real help
+          # prints instead.
+          status=0
+          output=$(docker run --rm thymira:ci --help 2>&1) || status=$?
+          echo "$output"
+          echo "exit code: $status"
+          if [ "$status" -ne 0 ]; then
+            echo "::error::the thymira CLI exited $status, expected 0"
+            exit 1
+          fi
+          echo "$output" | grep -qF 'Agentic Data Science Runtime' || {
+            echo "::error::the image did not print the thymira CLI help"
+            exit 1
+          }
+      - name: Report image size
+        run: docker image inspect thymira:ci --format 'thymira:ci {{.Size}} bytes' >> "$GITHUB_STEP_SUMMARY"
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+          python-version: "3.13"
+      - run: uv sync --locked --group test --all-packages
+      - name: Verify real container execution and audit evidence
+        run: |
+          docker info > /dev/null
+          docker image inspect thymira:dev --format '{{.Id}}'
+          uv run pytest tests/thymira/test_tools_sandbox_container.py \
+            tests/thymira/test_tools_e2e.py \
+            tests/thymira/test_tools_sandbox_output_integration.py \
+            tests/thymira/test_tools_git_container_integration.py \
+            -k container -p no:cacheprovider

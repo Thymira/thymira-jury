@@ -1,0 +1,16 @@
+{
+  "id": "pack_00000000000000000000000000000002",
+  "name": "credit-governance",
+  "version": "1.0",
+  "applicability_rules_version": "1.0",
+  "jurisdictions": ["ES"],
+  "required_any_data_categories": ["credit_history", "credit_score"],
+  "controls": [
+    {
+      "id": "CREDIT-OVERSIGHT-001",
+      "title": "Credit oversight evidence is present, verified, and fresh",
+      "required_evidence_kinds": ["artifact"],
+      "max_age_days": 7
+    }
+  ]
+}
